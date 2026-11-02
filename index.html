@@ -379,18 +379,7 @@
           }
           return [[side === "left" ? 0 : w, lidTop], ...points];
         };
-        const notchLeft = lidWingPoints("left")[1];
-        const notchRight = lidWingPoints("right")[1];
-        const notchDrop = notchLeft[1] - lidTop;
-        const neckCurve = (startX, wingPoint, wingBase) => {
-          const c2x = wingPoint[0] - 0.4 * (wingPoint[0] - wingBase[0]);
-          const c2y = wingPoint[1] - 0.4 * (wingPoint[1] - wingBase[1]);
-          const inward = Math.sign(wingBase[0] === 0 ? wingPoint[0] : -wingPoint[0]) * notchInset;
-          return `M${numberText(startX)},${numberText(lidTop)} C${numberText(startX - inward)},${numberText(lidTop + notchDrop * 0.5)} ${numberText(c2x)},${numberText(c2y)} ${numberText(wingPoint[0])},${numberText(wingPoint[1])}`;
-        };
         const notchCurves = [
-          neckCurve(-notchInset, notchLeft, [0, lidTop]),
-          neckCurve(w + notchInset, notchRight, [w, lidTop]),
           `M${numberText(-notchInset)},${numberText(lidTop)} L0,${numberText(lidTop)}`,
           `M${numberText(w)},${numberText(lidTop)} L${numberText(w + notchInset)},${numberText(lidTop)}`
         ];
