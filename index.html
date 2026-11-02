@@ -463,16 +463,19 @@
           `M0,${numberText(slotTop)} h${numberText(slotWidth)} v${numberText(slotHeight)} h-${numberText(slotWidth)} Z`,
           `M${numberText(w - slotWidth)},${numberText(slotTop)} h${numberText(slotWidth)} v${numberText(slotHeight)} h-${numberText(slotWidth)} Z`
         ];
-        const minX = left - sideLatchDepth - 4;
-        const maxX = right + sideLatchDepth + 4;
-        const minY = lidTop - h - 4;
-        const maxY = l + h + 4;
+        const svgPadding = 2;
+        const frameInset = 1;
+        const minX = left - sideLatchDepth - svgPadding;
+        const maxX = right + sideLatchDepth + svgPadding;
+        const minY = lidTop - h - svgPadding;
+        const maxY = l + h + svgPadding;
         const svgWidth = maxX - minX;
         const svgHeight = maxY - minY;
 
         return `<svg xmlns="http://www.w3.org/2000/svg" width="${numberText(svgWidth)}mm" height="${numberText(svgHeight)}mm" viewBox="${numberText(minX)} ${numberText(minY)} ${numberText(svgWidth)} ${numberText(svgHeight)}">
   <title>Folding cardboard box dieline — inside ${numberText(w)} × ${numberText(l)} × ${numberText(h)} mm</title>
   <g fill="none" stroke="#ff0000" stroke-width="0.15" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="${numberText(minX + frameInset)}" y="${numberText(minY + frameInset)}" width="${numberText(svgWidth - 2 * frameInset)}" height="${numberText(svgHeight - 2 * frameInset)}"/>
     <path d="${cutLines}"/>
     <path d="${tuckOutline}"/>
     <path d="${baseSlots.join(" ")}"/>
