@@ -307,10 +307,8 @@
         const h = height;
         const lidTop = -h - l;
         const tuckTip = lidTop - h;
-        const tuckEarTop = tuckTip + h * 0.25;
-        const tuckEarBottom = lidTop - h * 0.25;
         const tuckEarDepth = Math.min(h * 0.5, w * 0.15);
-        const tuckOutline = `M0,${numberText(lidTop)} V${numberText(tuckEarBottom)} C-${numberText(tuckEarDepth)},${numberText(tuckEarBottom)} -${numberText(tuckEarDepth)},${numberText(tuckEarTop)} 0,${numberText(tuckEarTop)} V${numberText(tuckTip)} H${numberText(w)} V${numberText(tuckEarTop)} C${numberText(w + tuckEarDepth)},${numberText(tuckEarTop)} ${numberText(w + tuckEarDepth)},${numberText(tuckEarBottom)} ${numberText(w)},${numberText(tuckEarBottom)} V${numberText(lidTop)}`;
+        const tuckOutline = `M0,${numberText(lidTop)} C-${numberText(tuckEarDepth)},${numberText(lidTop)} -${numberText(tuckEarDepth)},${numberText(tuckTip)} 0,${numberText(tuckTip)} H${numberText(w)} C${numberText(w + tuckEarDepth)},${numberText(tuckTip)} ${numberText(w + tuckEarDepth)},${numberText(lidTop)} ${numberText(w)},${numberText(lidTop)}`;
         const left = -2 * h;
         const right = w + 2 * h;
         const lidWingPoints = (side) => {
