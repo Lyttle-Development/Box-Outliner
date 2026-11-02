@@ -307,7 +307,7 @@
         const h = height;
         const lidTop = -h - l;
         const tuckTip = lidTop - h;
-        const tuckEarDepth = Math.min(h * 0.5, w * 0.15);
+        const tuckEarDepth = h * 0.8;
         const tuckOutline = `M0,${numberText(lidTop)} C-${numberText(tuckEarDepth)},${numberText(lidTop)} -${numberText(tuckEarDepth)},${numberText(tuckTip)} 0,${numberText(tuckTip)} H${numberText(w)} C${numberText(w + tuckEarDepth)},${numberText(tuckTip)} ${numberText(w + tuckEarDepth)},${numberText(lidTop)} ${numberText(w)},${numberText(lidTop)}`;
         const left = -2 * h;
         const right = w + 2 * h;
@@ -363,6 +363,8 @@
           [[0, l], [w, l]],
           [[0, -h], [w, -h]],
           [[0, lidTop], [w, lidTop]],
+          [[0, tuckTip], [0, lidTop]],
+          [[w, tuckTip], [w, lidTop]],
           [[0, lidTop], [0, -h]],
           [[w, lidTop], [w, -h]],
           [[0, -h], [0, 0]],
@@ -371,7 +373,7 @@
           [[w, l], [w, l + h]]
         ];
 
-        const vertices = [...polygons.flat(), ...slotEdges.flat()];
+        const vertices = [...polygons.flat(), ...slotEdges.flat(), [0, tuckTip], [w, tuckTip]];
         const onSegment = (p, a, b) => {
           const dx = b[0] - a[0];
           const dy = b[1] - a[1];
