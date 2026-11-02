@@ -500,8 +500,8 @@
           .replace(/height="[^"]+"/, `height="${numberText(previewHeight)}mm"`)
           .replace(/viewBox="[^"]+"/, `viewBox="${numberText(previewX)} ${numberText(previewY)} ${numberText(previewWidth)} ${numberText(previewHeight)}"`);
         const overlay = `<g class="engraver-overlay" pointer-events="none">
-    <rect x="${numberText(bedX)}" y="${numberText(bedY)}" width="${engraverWidth}" height="${engraverHeight}" fill="none" stroke="#f08a24" stroke-width="0.6" stroke-dasharray="4 2"/>
-    <rect x="${numberText(bedX)}" y="${numberText(bedY)}" width="${engraverWidth}" height="${engraverHeight}" fill="none" stroke="#202827" stroke-width="0.35" stroke-dasharray="0.8 5" stroke-dashoffset="-3" opacity="0.9"/>
+    <rect x="${numberText(bedX)}" y="${numberText(bedY)}" width="${engraverWidth}" height="${engraverHeight}" fill="none" stroke="#f08a24" stroke-width="0.8" stroke-dasharray="4 4"/>
+    <rect x="${numberText(bedX)}" y="${numberText(bedY)}" width="${engraverWidth}" height="${engraverHeight}" fill="none" stroke="#202827" stroke-width="0.8" stroke-dasharray="4 4" stroke-dashoffset="-4"/>
     <text x="${numberText(bedX + 4)}" y="${numberText(bedY + 10)}" fill="#202827" stroke="#fbfbf9" stroke-width="1.5" paint-order="stroke" font-size="5" font-family="sans-serif">Max engraver area · 381 × 305 mm</text>
   </g>`;
         return svg.replace(svgTag, updatedTag).replace("</svg>", `${overlay}</svg>`);
