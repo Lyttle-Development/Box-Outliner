@@ -345,23 +345,16 @@
         const lidTop = -h - l;
         const tuckTip = lidTop - h;
         const tuckEarDepth = h * 0.9;
-        const tuckCorner = h * 0.45;
-        const tuckR = tuckCorner;
         const notchInset = h * 0.25;
+        const tuckRx = tuckEarDepth - notchInset;
+        const tuckRy = h / 2;
         const thumbR = w * 0.055;
         const thumbX = w / 2;
         const tuckOutline = [
           `M${numberText(-notchInset)},${numberText(lidTop)}`,
-          `H${numberText(-tuckEarDepth + tuckR)}`,
-          `A${numberText(tuckR)},${numberText(tuckR)} 0 0 1 ${numberText(-tuckEarDepth)},${numberText(lidTop - tuckR)}`,
-          `V${numberText(tuckTip + tuckR)}`,
-          `A${numberText(tuckR)},${numberText(tuckR)} 0 0 1 ${numberText(-tuckEarDepth + tuckR)},${numberText(tuckTip)}`,
-          `H0 H${numberText(thumbX - thumbR)} A${numberText(thumbR)},${numberText(thumbR)} 0 0 0 ${numberText(thumbX + thumbR)},${numberText(tuckTip)} H${numberText(w)}`,
-          `H${numberText(w + tuckEarDepth - tuckR)}`,
-          `A${numberText(tuckR)},${numberText(tuckR)} 0 0 1 ${numberText(w + tuckEarDepth)},${numberText(tuckTip + tuckR)}`,
-          `V${numberText(lidTop - tuckR)}`,
-          `A${numberText(tuckR)},${numberText(tuckR)} 0 0 1 ${numberText(w + tuckEarDepth - tuckR)},${numberText(lidTop)}`,
-          `H${numberText(w + notchInset)}`
+          `A${numberText(tuckRx)},${numberText(tuckRy)} 0 0 1 ${numberText(-notchInset)},${numberText(tuckTip)}`,
+          `H0 H${numberText(thumbX - thumbR)} A${numberText(thumbR)},${numberText(thumbR)} 0 0 0 ${numberText(thumbX + thumbR)},${numberText(tuckTip)} H${numberText(w + notchInset)}`,
+          `A${numberText(tuckRx)},${numberText(tuckRy)} 0 0 1 ${numberText(w + notchInset)},${numberText(lidTop)}`
         ].join(" ");
         const left = -2 * h;
         const right = w + 2 * h;
