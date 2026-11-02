@@ -348,13 +348,15 @@
         const tuckCorner = h * 0.45;
         const tuckR = tuckCorner;
         const notchInset = h * 0.25;
+        const thumbR = w * 0.055;
+        const thumbX = w / 2;
         const tuckOutline = [
           `M${numberText(-notchInset)},${numberText(lidTop)}`,
           `H${numberText(-tuckEarDepth + tuckR)}`,
           `A${numberText(tuckR)},${numberText(tuckR)} 0 0 1 ${numberText(-tuckEarDepth)},${numberText(lidTop - tuckR)}`,
           `V${numberText(tuckTip + tuckR)}`,
           `A${numberText(tuckR)},${numberText(tuckR)} 0 0 1 ${numberText(-tuckEarDepth + tuckR)},${numberText(tuckTip)}`,
-          `H0 H${numberText(w)}`,
+          `H0 H${numberText(thumbX - thumbR)} A${numberText(thumbR)},${numberText(thumbR)} 0 0 0 ${numberText(thumbX + thumbR)},${numberText(tuckTip)} H${numberText(w)}`,
           `H${numberText(w + tuckEarDepth - tuckR)}`,
           `A${numberText(tuckR)},${numberText(tuckR)} 0 0 1 ${numberText(w + tuckEarDepth)},${numberText(tuckTip + tuckR)}`,
           `V${numberText(lidTop - tuckR)}`,
@@ -383,7 +385,8 @@
         const neckCurve = (startX, wingPoint, wingBase) => {
           const c2x = wingPoint[0] - 0.4 * (wingPoint[0] - wingBase[0]);
           const c2y = wingPoint[1] - 0.4 * (wingPoint[1] - wingBase[1]);
-          return `M${numberText(startX)},${numberText(lidTop)} C${numberText(startX)},${numberText(lidTop + notchDrop * 0.5)} ${numberText(c2x)},${numberText(c2y)} ${numberText(wingPoint[0])},${numberText(wingPoint[1])}`;
+          const inward = Math.sign(wingBase[0] === 0 ? wingPoint[0] : -wingPoint[0]) * notchInset;
+          return `M${numberText(startX)},${numberText(lidTop)} C${numberText(startX - inward)},${numberText(lidTop + notchDrop * 0.5)} ${numberText(c2x)},${numberText(c2y)} ${numberText(wingPoint[0])},${numberText(wingPoint[1])}`;
         };
         const notchCurves = [
           neckCurve(-notchInset, notchLeft, [0, lidTop]),
@@ -402,17 +405,13 @@
           [[0, slotTop], [0, slotBottom]],
           [[w, slotTop], [w, slotBottom]]
         ];
-        const thumbR = w * 0.055;
-        const thumbX = w / 2;
-        const thumbEdgeKey = edgeKey([thumbX - thumbR, l + h], [thumbX + thumbR, l + h]);
-        const thumbNotch = `M${numberText(thumbX - thumbR)},${numberText(l + h)} A${numberText(thumbR)},${numberText(thumbR)} 0 0 1 ${numberText(thumbX + thumbR)},${numberText(l + h)}`;
         const polygons = [
           [[0, 0], [w, 0], [w, l], [0, l]],
           [[-h, 0], [0, 0], [0, l], [-h, l]],
           [[left, 0], [-h, 0], [-h, l], [left, l], [left, sideLatchStart + sideLatchLength], [left - sideLatchDepth, sideLatchStart + sideLatchLength], [left - sideLatchDepth, sideLatchStart], [left, sideLatchStart]],
           [[w, 0], [w + h, 0], [w + h, l], [w, l]],
           [[w + h, 0], [right, 0], [right, sideLatchStart], [right + sideLatchDepth, sideLatchStart], [right + sideLatchDepth, sideLatchStart + sideLatchLength], [right, sideLatchStart + sideLatchLength], [right, l], [w + h, l]],
-          [[0, l], [w, l], [w, l + h], [thumbX + thumbR, l + h], [thumbX - thumbR, l + h], [0, l + h]],
+          [[0, l], [w, l], [w, l + h], [0, l + h]],
           [[0, -h], [w, -h], [w, 0], [0, 0]],
           [[0, lidTop], [w, lidTop], [w, -h], [0, -h]],
           lidWingPoints("left"),
@@ -484,7 +483,7 @@
         });
 
         const cutLines = [...edges.entries()]
-          .filter(([key]) => !foldKeys.has(key) && !slotEdgeKeys.has(key) && key !== thumbEdgeKey)
+          .filter(([key]) => !foldKeys.has(key) && !slotEdgeKeys.has(key))
           .map(([, [a, b]]) => `M${numberText(a[0])},${numberText(a[1])} L${numberText(b[0])},${numberText(b[1])}`)
           .join(" ");
         const foldLines = [...foldKeys]
@@ -511,7 +510,7 @@
     <rect x="${numberText(minX + frameInset)}" y="${numberText(minY + frameInset)}" width="${numberText(svgWidth - 2 * frameInset)}" height="${numberText(svgHeight - 2 * frameInset)}"/>
     <path d="${cutLines}"/>
     <path d="${tuckOutline}"/>
-    <path d="${notchCurves.join(" ")} ${thumbNotch}"/>
+    <path d="${notchCurves.join(" ")}"/>
     <path d="${baseSlots.join(" ")}"/>
   </g>
   <g fill="none" stroke="#000000" stroke-width="0.15" stroke-linecap="round" stroke-linejoin="round">
