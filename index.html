@@ -22,23 +22,29 @@
       body {
         margin: 0;
         min-width: 320px;
+        height: 100%;
+        overflow: hidden;
         background: var(--paper);
         color: var(--ink);
         font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       }
 
       .shell {
-        width: min(1120px, calc(100% - 40px));
+        display: flex;
+        width: min(1240px, calc(100% - 32px));
+        height: 100vh;
+        height: 100dvh;
         margin: 0 auto;
-        padding: 46px 0 56px;
+        padding: 16px 0;
+        flex-direction: column;
       }
 
-      header { margin-bottom: 30px; }
+      header { flex: 0 0 auto; margin-bottom: 12px; }
 
       .eyebrow {
-        margin: 0 0 10px;
+        margin: 0 0 5px;
         color: var(--green);
-        font-size: 12px;
+        font-size: 10px;
         font-weight: 750;
         letter-spacing: .13em;
         text-transform: uppercase;
@@ -46,58 +52,61 @@
 
       h1 {
         margin: 0;
-        font-size: clamp(32px, 5vw, 48px);
+        font-size: clamp(28px, 3.8vw, 38px);
         letter-spacing: -.045em;
-        line-height: 1.05;
+        line-height: 1;
       }
 
       .intro {
         max-width: 610px;
-        margin: 13px 0 0;
+        margin: 7px 0 0;
         color: var(--muted);
-        font-size: 16px;
-        line-height: 1.6;
+        font-size: 14px;
+        line-height: 1.4;
       }
 
       .workspace {
         display: grid;
-        grid-template-columns: minmax(270px, 330px) minmax(0, 1fr);
-        gap: 20px;
-        align-items: start;
+        min-height: 0;
+        flex: 1 1 auto;
+        grid-template-columns: minmax(250px, 310px) minmax(0, 1fr);
+        gap: 16px;
+        align-items: stretch;
       }
 
       .card {
         overflow: hidden;
+        min-height: 0;
         border: 1px solid var(--line);
         border-radius: 14px;
         background: var(--card);
         box-shadow: 0 10px 30px rgb(32 40 39 / 4%);
       }
 
-      .form-card { padding: 24px; }
+      .form-card { padding: 18px; }
 
       h2 {
         margin: 0;
-        font-size: 17px;
+        font-size: 16px;
         letter-spacing: -.02em;
       }
 
       .hint {
-        margin: 6px 0 21px;
+        margin: 5px 0 14px;
         color: var(--muted);
-        font-size: 13px;
+        font-size: 12px;
         line-height: 1.5;
       }
 
       .dimensions {
         display: grid;
-        gap: 15px;
+        gap: 10px;
       }
 
       label {
         display: block;
-        margin-bottom: 7px;
-        font-size: 13px;
+        margin-bottom: 5px;
+        font-size: 12px;
         font-weight: 650;
       }
 
@@ -105,14 +114,14 @@
 
       input {
         width: 100%;
-        height: 46px;
-        padding: 0 48px 0 12px;
+        height: 40px;
+        padding: 0 40px 0 10px;
         border: 1px solid #cfd3cc;
         border-radius: 8px;
         background: #fff;
         color: var(--ink);
         font: inherit;
-        font-size: 15px;
+        font-size: 14px;
       }
 
       input:focus {
@@ -123,16 +132,16 @@
       .unit {
         position: absolute;
         top: 50%;
-        right: 13px;
+        right: 10px;
         color: var(--muted);
-        font-size: 13px;
+        font-size: 12px;
         transform: translateY(-50%);
       }
 
       .download {
         width: 100%;
-        min-height: 48px;
-        margin-top: 21px;
+        min-height: 42px;
+        margin-top: 14px;
         border: 0;
         border-radius: 8px;
         background: var(--green);
@@ -150,27 +159,28 @@
 
       .notice {
         min-height: 18px;
-        margin: 11px 0 0;
+        margin: 7px 0 0;
         color: #a42b24;
         font-size: 12px;
         line-height: 1.45;
       }
 
       .material-note {
-        margin: 18px 0 0;
-        padding-top: 16px;
+        margin: 12px 0 0;
+        padding-top: 10px;
         border-top: 1px solid var(--line);
         color: var(--muted);
-        font-size: 12px;
-        line-height: 1.55;
+        font-size: 11px;
+        line-height: 1.45;
       }
 
-      .preview-card { min-width: 0; }
+      .preview-card { display: flex; min-width: 0; flex-direction: column; }
 
       .preview-head {
         display: flex;
-        min-height: 66px;
-        padding: 17px 20px;
+        min-height: 48px;
+        padding: 10px 14px;
+        flex: 0 0 auto;
         border-bottom: 1px solid var(--line);
         align-items: center;
         justify-content: space-between;
@@ -182,9 +192,9 @@
       .legend {
         display: flex;
         flex-wrap: wrap;
-        gap: 14px;
+        gap: 10px;
         color: var(--muted);
-        font-size: 11px;
+        font-size: 10px;
       }
 
       .legend-item { display: inline-flex; align-items: center; gap: 6px; }
@@ -197,8 +207,10 @@
 
       .preview {
         display: grid;
-        min-height: 450px;
-        padding: 22px;
+        min-height: 0;
+        padding: 12px;
+        flex: 1 1 auto;
+        overflow: hidden;
         background-color: #fbfbf9;
         background-image: linear-gradient(#e9eae5 1px, transparent 1px), linear-gradient(90deg, #e9eae5 1px, transparent 1px);
         background-size: 22px 22px;
@@ -208,7 +220,9 @@
       .preview svg {
         display: block;
         width: 100%;
-        max-height: 640px;
+        height: 100%;
+        max-width: 100%;
+        max-height: 100%;
         filter: drop-shadow(0 3px 4px rgb(20 30 27 / 9%));
       }
 
@@ -223,15 +237,31 @@
       }
 
       @media (max-width: 760px) {
-        .shell { width: min(100% - 28px, 560px); padding-top: 30px; }
-        .workspace { grid-template-columns: 1fr; }
-        .form-card { padding: 20px; }
-        .preview { min-height: 320px; padding: 16px; }
+        .shell { width: calc(100% - 24px); padding: 10px 0; }
+        header { margin-bottom: 8px; }
+        .eyebrow { margin-bottom: 3px; font-size: 9px; }
+        h1 { font-size: clamp(25px, 7vw, 32px); }
+        .intro { margin-top: 5px; font-size: 12px; line-height: 1.3; }
+        .workspace { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr); gap: 8px; }
+        .form-card { padding: 12px; }
+        .form-card h2 { font-size: 14px; }
+        .hint { margin: 3px 0 8px; font-size: 10px; line-height: 1.35; }
+        .dimensions { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+        label { margin-bottom: 4px; font-size: 10px; }
+        input { height: 36px; padding: 0 30px 0 8px; font-size: 12px; }
+        .unit { right: 8px; font-size: 10px; }
+        .download { min-height: 38px; margin-top: 9px; font-size: 12px; }
+        .notice { min-height: 0; margin-top: 5px; font-size: 10px; }
+        .material-note { display: none; }
+        .preview-head { min-height: 0; padding: 8px 10px; }
+        .preview-head h2 { font-size: 12px; }
+        .legend { gap: 7px; font-size: 9px; }
+        .preview { padding: 8px; }
       }
 
       @media (max-width: 440px) {
         .preview-head { align-items: flex-start; flex-direction: column; }
-        .preview { min-height: 250px; }
+        .preview { padding: 6px; }
       }
     </style>
   </head>
