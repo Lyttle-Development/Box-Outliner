@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f4f0">
+    <title>Box Outliner — cardboard box dielines</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #202827;
+        --muted: #64716e;
+        --paper: #f5f4f0;
+        --card: #fff;
+        --line: #dedfd9;
+        --green: #245c4b;
+        --red: #e33d35;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-width: 320px;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      .shell {
+        width: min(1120px, calc(100% - 40px));
+        margin: 0 auto;
+        padding: 46px 0 56px;
+      }
+
+      header { margin-bottom: 30px; }
+
+      .eyebrow {
+        margin: 0 0 10px;
+        color: var(--green);
+        font-size: 12px;
+        font-weight: 750;
+        letter-spacing: .13em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(32px, 5vw, 48px);
+        letter-spacing: -.045em;
+        line-height: 1.05;
+      }
+
+      .intro {
+        max-width: 610px;
+        margin: 13px 0 0;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.6;
+      }
+
+      .workspace {
+        display: grid;
+        grid-template-columns: minmax(270px, 330px) minmax(0, 1fr);
+        gap: 20px;
+        align-items: start;
+      }
+
+      .card {
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--card);
+        box-shadow: 0 10px 30px rgb(32 40 39 / 4%);
+      }
+
+      .form-card { padding: 24px; }
+
+      h2 {
+        margin: 0;
+        font-size: 17px;
+        letter-spacing: -.02em;
+      }
+
+      .hint {
+        margin: 6px 0 21px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .dimensions {
+        display: grid;
+        gap: 15px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 7px;
+        font-size: 13px;
+        font-weight: 650;
+      }
+
+      .input-wrap { position: relative; }
+
+      input {
+        width: 100%;
+        height: 46px;
+        padding: 0 48px 0 12px;
+        border: 1px solid #cfd3cc;
+        border-radius: 8px;
+        background: #fff;
+        color: var(--ink);
+        font: inherit;
+        font-size: 15px;
+      }
+
+      input:focus {
+        border-color: var(--green);
+        outline: 3px solid rgb(36 92 75 / 14%);
+      }
+
+      .unit {
+        position: absolute;
+        top: 50%;
+        right: 13px;
+        color: var(--muted);
+        font-size: 13px;
+        transform: translateY(-50%);
+      }
+
+      .download {
+        width: 100%;
+        min-height: 48px;
+        margin-top: 21px;
+        border: 0;
+        border-radius: 8px;
+        background: var(--green);
+        color: white;
+        cursor: pointer;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 700;
+        transition: background .15s ease, transform .15s ease;
+      }
+
+      .download:hover:not(:disabled) { background: #194b3b; }
+      .download:active:not(:disabled) { transform: translateY(1px); }
+      .download:disabled { cursor: not-allowed; opacity: .48; }
+
+      .notice {
+        min-height: 18px;
+        margin: 11px 0 0;
+        color: #a42b24;
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .material-note {
+        margin: 18px 0 0;
+        padding-top: 16px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.55;
+      }
+
+      .preview-card { min-width: 0; }
+
+      .preview-head {
+        display: flex;
+        min-height: 66px;
+        padding: 17px 20px;
+        border-bottom: 1px solid var(--line);
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .preview-head h2 { font-size: 15px; }
+
+      .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        color: var(--muted);
+        font-size: 11px;
+      }
+
+      .legend-item { display: inline-flex; align-items: center; gap: 6px; }
+      .swatch { width: 18px; height: 2px; background: var(--red); }
+      .swatch.engrave { background: #202827; }
+
+      .preview {
+        display: grid;
+        min-height: 450px;
+        padding: 22px;
+        background-color: #fbfbf9;
+        background-image: linear-gradient(#e9eae5 1px, transparent 1px), linear-gradient(90deg, #e9eae5 1px, transparent 1px);
+        background-size: 22px 22px;
+        place-items: center;
+      }
+
+      .preview svg {
+        display: block;
+        width: 100%;
+        max-height: 640px;
+        filter: drop-shadow(0 3px 4px rgb(20 30 27 / 9%));
+      }
+
+      .empty-state {
+        max-width: 280px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.55;
+        text-align: center;
+      }
+
+      @media (max-width: 760px) {
+        .shell { width: min(100% - 28px, 560px); padding-top: 30px; }
+        .workspace { grid-template-columns: 1fr; }
+        .form-card { padding: 20px; }
+        .preview { min-height: 320px; padding: 16px; }
+      }
+
+      @media (max-width: 440px) {
+        .preview-head { align-items: flex-start; flex-direction: column; }
+        .preview { min-height: 250px; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <header>
+        <p class="eyebrow">A simple box-making tool</p>
+        <h1>Box Outliner</h1>
+        <p class="intro">Enter the inside width, length and height. Get a ready-to-cut folding box dieline as an SVG.</p>
+      </header>
+
+      <section class="workspace" aria-label="Box dieline generator">
+        <section class="card form-card" aria-labelledby="dimensions-title">
+          <h2 id="dimensions-title">Inside dimensions</h2>
+          <p class="hint">All measurements are in millimetres. The preview updates as you type.</p>
+          <form id="dimensions-form" novalidate>
+            <div class="dimensions">
+              <div>
+                <label for="width">Width</label>
+                <div class="input-wrap">
+                  <input id="width" name="width" type="number" min="1" max="5000" step="0.1" value="200" required>
+                  <span class="unit" aria-hidden="true">mm</span>
+                </div>
+              </div>
+              <div>
+                <label for="length">Length</label>
+                <div class="input-wrap">
+                  <input id="length" name="length" type="number" min="1" max="5000" step="0.1" value="150" required>
+                  <span class="unit" aria-hidden="true">mm</span>
+                </div>
+              </div>
+              <div>
+                <label for="height">Height</label>
+                <div class="input-wrap">
+                  <input id="height" name="height" type="number" min="1" max="5000" step="0.1" value="75" required>
+                  <span class="unit" aria-hidden="true">mm</span>
+                </div>
+              </div>
+            </div>
+            <button class="download" id="download" type="button">Download SVG</button>
+            <p class="notice" id="notice" role="status" aria-live="polite"></p>
+          </form>
+          <p class="material-note">The dieline is a hinged-lid mailer with fold/engrave lines and glue tabs. Cardboard thickness and machine kerf are not compensated; test-fold a sample before production.</p>
+        </section>
+
+        <section class="card preview-card" aria-labelledby="preview-title">
+          <div class="preview-head">
+            <h2 id="preview-title">Live dieline preview</h2>
+            <div class="legend" aria-label="Line colors">
+              <span class="legend-item"><span class="swatch"></span>Cut</span>
+              <span class="legend-item"><span class="swatch engrave"></span>Engrave / fold</span>
+            </div>
+          </div>
+          <div class="preview" id="preview" aria-label="SVG dieline preview"></div>
+        </section>
+      </section>
+    </main>
+
+    <script>
+      const inputs = {
+        width: document.getElementById("width"),
+        length: document.getElementById("length"),
+        height: document.getElementById("height")
+      };
+      const preview = document.getElementById("preview");
+      const notice = document.getElementById("notice");
+      const downloadButton = document.getElementById("download");
+      let currentSvg = "";
+
+      const numberText = (value) => Number(value.toFixed(3)).toString();
+      const pointKey = (point) => `${numberText(point[0])},${numberText(point[1])}`;
+      const edgeKey = (a, b) => [pointKey(a), pointKey(b)].sort().join("|");
+
+      function makeBoxSvg(width, length, height) {
+        const w = width;
+        const l = length;
+        const h = height;
+        const tuckInset = Math.min(h * 0.28, w * 0.16);
+        const tuckShoulder = h * 0.22;
+        const lidTop = -h - l;
+        const tabInset = h * 0.18;
+        const tabTipInset = h * 0.2;
+        const left = -h;
+        const right = w + h;
+        const polygons = [
+          [[0, 0], [w, 0], [w, l], [0, l]],
+          [[-h, 0], [0, 0], [0, l], [-h, l]],
+          [[w, 0], [w + h, 0], [w + h, l], [w, l]],
+          [[0, l], [w, l], [w, l + h], [0, l + h]],
+          [[0, -h], [w, -h], [w, 0], [0, 0]],
+          [[0, lidTop], [w, lidTop], [w, -h], [0, -h]],
+          [[left, lidTop], [0, lidTop], [0, -h], [left, -h]],
+          [[w, lidTop], [right, lidTop], [right, -h], [w, -h]],
+          [[0, lidTop], [w, lidTop], [w, lidTop - tuckShoulder], [w - tuckInset, lidTop - h], [tuckInset, lidTop - h], [0, lidTop - tuckShoulder]],
+          [[left, 0], [0, 0], [0, -tabInset], [left + tabTipInset, -h], [left + h - tabTipInset, -h], [left, -tabInset]],
+          [[w, 0], [right, 0], [right, -tabInset], [right - tabTipInset, -h], [w + tabTipInset, -h], [w, -tabInset]],
+          [[left, l], [0, l], [0, l + tabInset], [left + tabTipInset, l + h], [left + h - tabTipInset, l + h], [left, l + tabInset]],
+          [[w, l], [right, l], [right, l + tabInset], [right - tabTipInset, l + h], [w + tabTipInset, l + h], [w, l + tabInset]]
+        ];
+        const folds = [
+          [[0, 0], [0, l]],
+          [[w, 0], [w, l]],
+          [[0, 0], [w, 0]],
+          [[0, l], [w, l]],
+          [[0, -h], [w, -h]],
+          [[0, lidTop], [w, lidTop]],
+          [[0, lidTop], [0, -h]],
+          [[w, lidTop], [w, -h]],
+          [[left, 0], [0, 0]],
+          [[w, 0], [right, 0]],
+          [[left, l], [0, l]],
+          [[w, l], [right, l]]
+        ];
+
+        const vertices = polygons.flat();
+        const onSegment = (p, a, b) => {
+          const dx = b[0] - a[0];
+          const dy = b[1] - a[1];
+          const cross = (p[0] - a[0]) * dy - (p[1] - a[1]) * dx;
+          if (Math.abs(cross) > 1e-7) return false;
+          const dot = (p[0] - a[0]) * dx + (p[1] - a[1]) * dy;
+          return dot >= -1e-7 && dot <= dx * dx + dy * dy + 1e-7;
+        };
+        const split = (a, b) => {
+          const dx = b[0] - a[0];
+          const dy = b[1] - a[1];
+          const lengthSquared = dx * dx + dy * dy;
+          const ordered = vertices
+            .filter((point) => onSegment(point, a, b))
+            .map((point) => ({
+              point,
+              t: ((point[0] - a[0]) * dx + (point[1] - a[1]) * dy) / lengthSquared
+            }))
+            .sort((first, second) => first.t - second.t)
+            .reduce((unique, entry) => {
+              if (!unique.length || Math.abs(entry.t - unique[unique.length - 1].t) > 1e-8) unique.push(entry);
+              return unique;
+            }, []);
+          return ordered.slice(1).map((entry, index) => [ordered[index].point, entry.point]);
+        };
+
+        const foldKeys = new Set(folds.flatMap(([a, b]) => split(a, b).map(([start, end]) => edgeKey(start, end))));
+        const edges = new Map();
+        polygons.forEach((polygon) => {
+          polygon.forEach((point, index) => {
+            const next = polygon[(index + 1) % polygon.length];
+            split(point, next).forEach(([start, end]) => {
+              const key = edgeKey(start, end);
+              if (!edges.has(key)) edges.set(key, [start, end]);
+            });
+          });
+        });
+
+        const cutLines = [...edges.entries()]
+          .filter(([key]) => !foldKeys.has(key))
+          .map(([, [a, b]]) => `M${numberText(a[0])},${numberText(a[1])} L${numberText(b[0])},${numberText(b[1])}`)
+          .join(" ");
+        const foldLines = [...foldKeys]
+          .map((key) => key.split("|").map((pair) => pair.split(",").map(Number)))
+          .map(([a, b]) => `M${numberText(a[0])},${numberText(a[1])} L${numberText(b[0])},${numberText(b[1])}`)
+          .join(" ");
+
+        const slotWidth = Math.min(w * 0.9, w - 2 * tuckInset + h * 0.1);
+        const slotStart = (w - slotWidth) / 2;
+        const slotY = l + h * 0.38;
+        const minX = left - 4;
+        const maxX = right + 4;
+        const minY = lidTop - h - 4;
+        const maxY = l + h + 4;
+        const svgWidth = maxX - minX;
+        const svgHeight = maxY - minY;
+
+        return `<svg xmlns="http://www.w3.org/2000/svg" width="${numberText(svgWidth)}mm" height="${numberText(svgHeight)}mm" viewBox="${numberText(minX)} ${numberText(minY)} ${numberText(svgWidth)} ${numberText(svgHeight)}">
+  <title>Folding cardboard box dieline — inside ${numberText(w)} × ${numberText(l)} × ${numberText(h)} mm</title>
+  <g fill="none" stroke="#e33d35" stroke-width="0.15" stroke-linecap="round" stroke-linejoin="round">
+    <path d="${cutLines}"/>
+    <path d="M${numberText(slotStart)},${numberText(slotY)} H${numberText(slotStart + slotWidth)}"/>
+  </g>
+  <g fill="none" stroke="#000000" stroke-width="0.15" stroke-linecap="round" stroke-linejoin="round">
+    <path d="${foldLines}"/>
+  </g>
+</svg>`;
+      }
+
+      function updatePreview() {
+        const values = Object.values(inputs).map((input) => input.valueAsNumber);
+        const invalid = values.some((value, index) =>
+          !Number.isFinite(value) || value < 1 || value > 5000 || inputs[Object.keys(inputs)[index]].validity.badInput
+        );
+        if (invalid) {
+          currentSvg = "";
+          preview.innerHTML = '<p class="empty-state">Enter a number from 1 to 5,000 mm for each dimension to see your dieline.</p>';
+          notice.textContent = "Dimensions must be between 1 and 5,000 mm.";
+          downloadButton.disabled = true;
+          return;
+        }
+
+        currentSvg = makeBoxSvg(...values);
+        preview.innerHTML = currentSvg;
+        notice.textContent = "";
+        downloadButton.disabled = false;
+      }
+
+      Object.values(inputs).forEach((input) => input.addEventListener("input", updatePreview));
+      downloadButton.addEventListener("click", () => {
+        if (!currentSvg) return;
+        const blob = new Blob([currentSvg], { type: "image/svg+xml;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `box-${inputs.width.value}x${inputs.length.value}x${inputs.height.value}-mm.svg`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+      });
+
+      updatePreview();
+    </script>
+  </body>
+</html>
