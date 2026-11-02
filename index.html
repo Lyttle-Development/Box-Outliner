@@ -360,15 +360,11 @@
         const right = w + 2 * h;
         const lidWingPoints = (side) => {
           const points = [];
-          for (let index = 1; index <= 16; index += 1) {
-            const t = index / 16;
-            const edgeDepth = 0.2;
-            const offset = h * (t < edgeDepth
-              ? Math.sin(Math.PI * t / (2 * edgeDepth))
-              : t > 1 - edgeDepth
-                ? Math.sin(Math.PI * (1 - t) / (2 * edgeDepth))
-                : 1);
-            points.push([side === "left" ? -offset : w + offset, lidTop + l * t]);
+          for (let index = 1; index <= 32; index += 1) {
+            const t = index / 32;
+            const offset = h * Math.sin(Math.PI * t);
+            const y = lidTop + l * (1 - Math.cos(Math.PI * t)) / 2;
+            points.push([side === "left" ? -offset : w + offset, y]);
           }
           return [[side === "left" ? 0 : w, lidTop], ...points];
         };
