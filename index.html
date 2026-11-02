@@ -306,8 +306,6 @@
         const l = length;
         const h = height;
         const lidTop = -h - l;
-        const tabInset = h * 0.18;
-        const tabTipInset = h * 0.2;
         const tuckRadius = Math.min(h * 0.18, w * 0.12, 8);
         const tuckTip = lidTop - h;
         const arcPoints = (cx, cy, radius, start, end, steps) =>
@@ -323,36 +321,57 @@
           [tuckRadius, tuckTip],
           ...arcPoints(tuckRadius, tuckTip + tuckRadius, tuckRadius, -Math.PI / 2, -Math.PI, 5)
         ];
-        const left = -h;
-        const right = w + h;
+        const left = -2 * h;
+        const right = w + 2 * h;
+        const lidWingPoints = (side) => {
+          const points = [];
+          for (let index = 1; index <= 16; index += 1) {
+            const t = index / 16;
+            const edgeDepth = 0.2;
+            const offset = h * (t < edgeDepth
+              ? Math.sin(Math.PI * t / (2 * edgeDepth))
+              : t > 1 - edgeDepth
+                ? Math.sin(Math.PI * (1 - t) / (2 * edgeDepth))
+                : 1);
+            points.push([side === "left" ? -offset : w + offset, lidTop + l * t]);
+          }
+          return [[side === "left" ? 0 : w, lidTop], ...points];
+        };
+        const sideLatchLength = Math.min(h * 0.45, l * 0.28);
+        const sideLatchStart = (l - sideLatchLength) / 2;
+        const sideLatchDepth = h * 0.12;
         const polygons = [
           [[0, 0], [w, 0], [w, l], [0, l]],
           [[-h, 0], [0, 0], [0, l], [-h, l]],
+          [[left, 0], [-h, 0], [-h, l], [left, l], [left, sideLatchStart + sideLatchLength], [left - sideLatchDepth, sideLatchStart + sideLatchLength], [left - sideLatchDepth, sideLatchStart], [left, sideLatchStart]],
           [[w, 0], [w + h, 0], [w + h, l], [w, l]],
+          [[w + h, 0], [right, 0], [right, sideLatchStart], [right + sideLatchDepth, sideLatchStart], [right + sideLatchDepth, sideLatchStart + sideLatchLength], [right, sideLatchStart + sideLatchLength], [right, l], [w + h, l]],
           [[0, l], [w, l], [w, l + h], [0, l + h]],
           [[0, -h], [w, -h], [w, 0], [0, 0]],
           [[0, lidTop], [w, lidTop], [w, -h], [0, -h]],
-          [[left, lidTop], [0, lidTop], [0, -h], [left, -h]],
-          [[w, lidTop], [right, lidTop], [right, -h], [w, -h]],
+          lidWingPoints("left"),
+          lidWingPoints("right"),
           tuckTab,
-          [[left, 0], [0, 0], [0, -tabInset], [left + h - tabTipInset, -h], [left + tabTipInset, -h], [left, -tabInset]],
-          [[w, 0], [right, 0], [right, -tabInset], [right - tabTipInset, -h], [w + tabTipInset, -h], [w, -tabInset]],
-          [[left, l], [0, l], [0, l + tabInset], [left + h - tabTipInset, l + h], [left + tabTipInset, l + h], [left, l + tabInset]],
-          [[w, l], [right, l], [right, l + tabInset], [right - tabTipInset, l + h], [w + tabTipInset, l + h], [w, l + tabInset]]
+          [[-h, -h], [0, -h], [0, 0], [-h, 0]],
+          [[w, -h], [w + h, -h], [w + h, 0], [w, 0]],
+          [[-h, l], [0, l], [0, l + h], [-h, l + h]],
+          [[w, l], [w + h, l], [w + h, l + h], [w, l + h]]
         ];
         const folds = [
           [[0, 0], [0, l]],
           [[w, 0], [w, l]],
+          [[-h, 0], [-h, l]],
+          [[w + h, 0], [w + h, l]],
           [[0, 0], [w, 0]],
           [[0, l], [w, l]],
           [[0, -h], [w, -h]],
           [[0, lidTop], [w, lidTop]],
           [[0, lidTop], [0, -h]],
           [[w, lidTop], [w, -h]],
-          [[left, 0], [0, 0]],
-          [[w, 0], [right, 0]],
-          [[left, l], [0, l]],
-          [[w, l], [right, l]]
+          [[0, -h], [0, 0]],
+          [[w, -h], [w, 0]],
+          [[0, l], [0, l + h]],
+          [[w, l], [w, l + h]]
         ];
 
         const vertices = polygons.flat();
@@ -403,18 +422,14 @@
           .map(([a, b]) => `M${numberText(a[0])},${numberText(a[1])} L${numberText(b[0])},${numberText(b[1])}`)
           .join(" ");
 
-        const slotWidth = Math.min(w, w - 2 * tuckRadius + h * 0.1);
-        const slotStart = (w - slotWidth) / 2;
-        const slotY = l + h * 0.16;
-        const cornerSlotX = Math.min(h * 0.3, w * 0.25);
-        const lockingSlots = [
-          `M${numberText(cornerSlotX)},${numberText(-h * 0.75)} V${numberText(-h * 0.25)}`,
-          `M${numberText(w - cornerSlotX)},${numberText(-h * 0.75)} V${numberText(-h * 0.25)}`,
-          `M${numberText(cornerSlotX)},${numberText(l + h * 0.25)} V${numberText(l + h * 0.75)}`,
-          `M${numberText(w - cornerSlotX)},${numberText(l + h * 0.25)} V${numberText(l + h * 0.75)}`
+        const sideSlotLength = Math.min(l * 0.38, h);
+        const sideSlotStart = (l - sideSlotLength) / 2;
+        const sideSlots = [
+          `M${numberText(-h * 0.12)},${numberText(sideSlotStart)} V${numberText(sideSlotStart + sideSlotLength)}`,
+          `M${numberText(w + h * 0.12)},${numberText(sideSlotStart)} V${numberText(sideSlotStart + sideSlotLength)}`
         ];
-        const minX = left - 4;
-        const maxX = right + 4;
+        const minX = left - sideLatchDepth - 4;
+        const maxX = right + sideLatchDepth + 4;
         const minY = lidTop - h - 4;
         const maxY = l + h + 4;
         const svgWidth = maxX - minX;
@@ -424,8 +439,7 @@
   <title>Folding cardboard box dieline — inside ${numberText(w)} × ${numberText(l)} × ${numberText(h)} mm</title>
   <g fill="none" stroke="#ff0000" stroke-width="0.15" stroke-linecap="round" stroke-linejoin="round">
     <path d="${cutLines}"/>
-    <path d="M${numberText(slotStart)},${numberText(slotY)} H${numberText(slotStart + slotWidth)}"/>
-    <path d="${lockingSlots.join(" ")}"/>
+    <path d="${sideSlots.join(" ")}"/>
   </g>
   <g fill="none" stroke="#000000" stroke-width="0.15" stroke-linecap="round" stroke-linejoin="round">
     <path d="${foldLines}"/>
