@@ -422,11 +422,13 @@
           .map(([a, b]) => `M${numberText(a[0])},${numberText(a[1])} L${numberText(b[0])},${numberText(b[1])}`)
           .join(" ");
 
-        const sideSlotLength = Math.min(l * 0.38, h);
-        const sideSlotStart = (l - sideSlotLength) / 2;
-        const sideSlots = [
-          `M${numberText(-h * 0.12)},${numberText(sideSlotStart)} V${numberText(sideSlotStart + sideSlotLength)}`,
-          `M${numberText(w + h * 0.12)},${numberText(sideSlotStart)} V${numberText(sideSlotStart + sideSlotLength)}`
+        const slotWidth = Math.min(h * 0.1, w * 0.12);
+        const slotInset = Math.min(h * 0.12, w * 0.2);
+        const slotHeight = Math.min(l * 0.38, h);
+        const slotTop = (l - slotHeight) / 2;
+        const baseSlots = [
+          `M${numberText(slotInset)},${numberText(slotTop)} h${numberText(slotWidth)} v${numberText(slotHeight)} h-${numberText(slotWidth)} Z`,
+          `M${numberText(w - slotInset - slotWidth)},${numberText(slotTop)} h${numberText(slotWidth)} v${numberText(slotHeight)} h-${numberText(slotWidth)} Z`
         ];
         const minX = left - sideLatchDepth - 4;
         const maxX = right + sideLatchDepth + 4;
@@ -439,7 +441,7 @@
   <title>Folding cardboard box dieline — inside ${numberText(w)} × ${numberText(l)} × ${numberText(h)} mm</title>
   <g fill="none" stroke="#ff0000" stroke-width="0.15" stroke-linecap="round" stroke-linejoin="round">
     <path d="${cutLines}"/>
-    <path d="${sideSlots.join(" ")}"/>
+    <path d="${baseSlots.join(" ")}"/>
   </g>
   <g fill="none" stroke="#000000" stroke-width="0.15" stroke-linecap="round" stroke-linejoin="round">
     <path d="${foldLines}"/>
