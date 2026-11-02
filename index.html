@@ -379,11 +379,18 @@
         };
         const notchLeft = lidWingPoints("left")[1];
         const notchRight = lidWingPoints("right")[1];
+        const notchDrop = notchLeft[1] - lidTop;
+        const neckCurve = (startX, wingPoint, wingBase) => {
+          const c2x = wingPoint[0] - 0.4 * (wingPoint[0] - wingBase[0]);
+          const c2y = wingPoint[1] - 0.4 * (wingPoint[1] - wingBase[1]);
+          return `M${numberText(startX)},${numberText(lidTop)} C${numberText(startX)},${numberText(lidTop + notchDrop * 0.5)} ${numberText(c2x)},${numberText(c2y)} ${numberText(wingPoint[0])},${numberText(wingPoint[1])}`;
+        };
         const notchCurves = [
-          `M${numberText(-notchInset)},${numberText(lidTop)} Q0,${numberText(lidTop)} ${numberText(notchLeft[0])},${numberText(notchLeft[1])}`,
-          `M${numberText(w + notchInset)},${numberText(lidTop)} Q${numberText(w)},${numberText(lidTop)} ${numberText(notchRight[0])},${numberText(notchRight[1])}`
+          neckCurve(-notchInset, notchLeft, [0, lidTop]),
+          neckCurve(w + notchInset, notchRight, [w, lidTop]),
+          `M${numberText(-notchInset)},${numberText(lidTop)} L0,${numberText(lidTop)}`,
+          `M${numberText(w)},${numberText(lidTop)} L${numberText(w + notchInset)},${numberText(lidTop)}`
         ];
-        const notchEdgeKeys = new Set([edgeKey([0, lidTop], notchLeft), edgeKey([w, lidTop], notchRight)]);
         const sideLatchLength = l * 0.5;
         const sideLatchStart = (l - sideLatchLength) / 2;
         const sideLatchDepth = 3;
@@ -395,13 +402,17 @@
           [[0, slotTop], [0, slotBottom]],
           [[w, slotTop], [w, slotBottom]]
         ];
+        const thumbR = w * 0.055;
+        const thumbX = w / 2;
+        const thumbEdgeKey = edgeKey([thumbX - thumbR, l + h], [thumbX + thumbR, l + h]);
+        const thumbNotch = `M${numberText(thumbX - thumbR)},${numberText(l + h)} A${numberText(thumbR)},${numberText(thumbR)} 0 0 1 ${numberText(thumbX + thumbR)},${numberText(l + h)}`;
         const polygons = [
           [[0, 0], [w, 0], [w, l], [0, l]],
           [[-h, 0], [0, 0], [0, l], [-h, l]],
           [[left, 0], [-h, 0], [-h, l], [left, l], [left, sideLatchStart + sideLatchLength], [left - sideLatchDepth, sideLatchStart + sideLatchLength], [left - sideLatchDepth, sideLatchStart], [left, sideLatchStart]],
           [[w, 0], [w + h, 0], [w + h, l], [w, l]],
           [[w + h, 0], [right, 0], [right, sideLatchStart], [right + sideLatchDepth, sideLatchStart], [right + sideLatchDepth, sideLatchStart + sideLatchLength], [right, sideLatchStart + sideLatchLength], [right, l], [w + h, l]],
-          [[0, l], [w, l], [w, l + h], [0, l + h]],
+          [[0, l], [w, l], [w, l + h], [thumbX + thumbR, l + h], [thumbX - thumbR, l + h], [0, l + h]],
           [[0, -h], [w, -h], [w, 0], [0, 0]],
           [[0, lidTop], [w, lidTop], [w, -h], [0, -h]],
           lidWingPoints("left"),
@@ -473,7 +484,7 @@
         });
 
         const cutLines = [...edges.entries()]
-          .filter(([key]) => !foldKeys.has(key) && !slotEdgeKeys.has(key) && !notchEdgeKeys.has(key))
+          .filter(([key]) => !foldKeys.has(key) && !slotEdgeKeys.has(key) && key !== thumbEdgeKey)
           .map(([, [a, b]]) => `M${numberText(a[0])},${numberText(a[1])} L${numberText(b[0])},${numberText(b[1])}`)
           .join(" ");
         const foldLines = [...foldKeys]
@@ -500,7 +511,7 @@
     <rect x="${numberText(minX + frameInset)}" y="${numberText(minY + frameInset)}" width="${numberText(svgWidth - 2 * frameInset)}" height="${numberText(svgHeight - 2 * frameInset)}"/>
     <path d="${cutLines}"/>
     <path d="${tuckOutline}"/>
-    <path d="${notchCurves.join(" ")}"/>
+    <path d="${notchCurves.join(" ")} ${thumbNotch}"/>
     <path d="${baseSlots.join(" ")}"/>
   </g>
   <g fill="none" stroke="#000000" stroke-width="0.15" stroke-linecap="round" stroke-linejoin="round">
