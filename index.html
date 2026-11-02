@@ -345,10 +345,11 @@
         const lidTop = -h - l;
         const tuckTip = lidTop - h;
         const tuckEarDepth = h * 0.9;
-        const tuckCorner = h * 0.25;
+        const tuckCorner = h * 0.45;
         const tuckR = tuckCorner;
+        const notchInset = h * 0.25;
         const tuckOutline = [
-          `M0,${numberText(lidTop)}`,
+          `M${numberText(-notchInset)},${numberText(lidTop)}`,
           `H${numberText(-tuckEarDepth + tuckR)}`,
           `A${numberText(tuckR)},${numberText(tuckR)} 0 0 1 ${numberText(-tuckEarDepth)},${numberText(lidTop - tuckR)}`,
           `V${numberText(tuckTip + tuckR)}`,
@@ -358,7 +359,7 @@
           `A${numberText(tuckR)},${numberText(tuckR)} 0 0 1 ${numberText(w + tuckEarDepth)},${numberText(tuckTip + tuckR)}`,
           `V${numberText(lidTop - tuckR)}`,
           `A${numberText(tuckR)},${numberText(tuckR)} 0 0 1 ${numberText(w + tuckEarDepth - tuckR)},${numberText(lidTop)}`,
-          `H${numberText(w)}`
+          `H${numberText(w + notchInset)}`
         ].join(" ");
         const left = -2 * h;
         const right = w + 2 * h;
@@ -376,6 +377,13 @@
           }
           return [[side === "left" ? 0 : w, lidTop], ...points];
         };
+        const notchLeft = lidWingPoints("left")[1];
+        const notchRight = lidWingPoints("right")[1];
+        const notchCurves = [
+          `M${numberText(-notchInset)},${numberText(lidTop)} Q0,${numberText(lidTop)} ${numberText(notchLeft[0])},${numberText(notchLeft[1])}`,
+          `M${numberText(w + notchInset)},${numberText(lidTop)} Q${numberText(w)},${numberText(lidTop)} ${numberText(notchRight[0])},${numberText(notchRight[1])}`
+        ];
+        const notchEdgeKeys = new Set([edgeKey([0, lidTop], notchLeft), edgeKey([w, lidTop], notchRight)]);
         const sideLatchLength = l * 0.5;
         const sideLatchStart = (l - sideLatchLength) / 2;
         const sideLatchDepth = 3;
@@ -465,7 +473,7 @@
         });
 
         const cutLines = [...edges.entries()]
-          .filter(([key]) => !foldKeys.has(key) && !slotEdgeKeys.has(key))
+          .filter(([key]) => !foldKeys.has(key) && !slotEdgeKeys.has(key) && !notchEdgeKeys.has(key))
           .map(([, [a, b]]) => `M${numberText(a[0])},${numberText(a[1])} L${numberText(b[0])},${numberText(b[1])}`)
           .join(" ");
         const foldLines = [...foldKeys]
@@ -492,6 +500,7 @@
     <rect x="${numberText(minX + frameInset)}" y="${numberText(minY + frameInset)}" width="${numberText(svgWidth - 2 * frameInset)}" height="${numberText(svgHeight - 2 * frameInset)}"/>
     <path d="${cutLines}"/>
     <path d="${tuckOutline}"/>
+    <path d="${notchCurves.join(" ")}"/>
     <path d="${baseSlots.join(" ")}"/>
   </g>
   <g fill="none" stroke="#000000" stroke-width="0.15" stroke-linecap="round" stroke-linejoin="round">
