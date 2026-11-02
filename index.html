@@ -361,19 +361,17 @@
         const lidWingPoints = (side) => {
           const edgeX = side === "left" ? 0 : w;
           const sign = side === "left" ? -1 : 1;
-          const wingInset = h * 0.25;
-          const halfChord = l / 4;
-          const sagitta = h - wingInset;
-          const radius = (halfChord * halfChord + sagitta * sagitta) / (2 * sagitta);
-          const halfAngle = Math.asin(halfChord / radius);
-          const midY = lidTop + l / 2;
           const arcSteps = 32;
-          const points = [[edgeX, lidTop]];
-          for (let index = 0; index <= arcSteps; index += 1) {
-            const angle = -halfAngle + (2 * halfAngle * index) / arcSteps;
-            points.push([edgeX + sign * (h - radius + radius * Math.cos(angle)), midY + radius * Math.sin(angle)]);
-          }
-          points.push([edgeX, -h]);
+          const outerX = edgeX + sign * h;
+          const points = [];
+          const sampleArc = (centerY, fromAngle, toAngle) => {
+            for (let index = 0; index <= arcSteps; index += 1) {
+              const angle = fromAngle + ((toAngle - fromAngle) * index) / arcSteps;
+              points.push([outerX + h * Math.cos(angle), centerY + h * Math.sin(angle)]);
+            }
+          };
+          sampleArc(lidTop, sign < 0 ? 0 : Math.PI, Math.PI / 2);
+          sampleArc(-h, -Math.PI / 2, sign < 0 ? 0 : -Math.PI);
           return points;
         };
         const notchCurves = [
