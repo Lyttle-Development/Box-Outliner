@@ -340,6 +340,14 @@
         const sideLatchLength = Math.min(h * 0.45, l * 0.28);
         const sideLatchStart = (l - sideLatchLength) / 2;
         const sideLatchDepth = h * 0.12;
+        const slotWidth = Math.min(h * 0.1, w * 0.12);
+        const slotHeight = Math.min(l * 0.38, h);
+        const slotTop = (l - slotHeight) / 2;
+        const slotBottom = slotTop + slotHeight;
+        const slotEdges = [
+          [[0, slotTop], [0, slotBottom]],
+          [[w, slotTop], [w, slotBottom]]
+        ];
         const polygons = [
           [[0, 0], [w, 0], [w, l], [0, l]],
           [[-h, 0], [0, 0], [0, l], [-h, l]],
@@ -358,8 +366,10 @@
           [[w, l], [w + h, l], [w + h, l + h], [w, l + h]]
         ];
         const folds = [
-          [[0, 0], [0, l]],
-          [[w, 0], [w, l]],
+          [[0, 0], [0, slotTop]],
+          [[0, slotBottom], [0, l]],
+          [[w, 0], [w, slotTop]],
+          [[w, slotBottom], [w, l]],
           [[-h, 0], [-h, l]],
           [[w + h, 0], [w + h, l]],
           [[0, 0], [w, 0]],
@@ -374,7 +384,7 @@
           [[w, l], [w, l + h]]
         ];
 
-        const vertices = polygons.flat();
+        const vertices = [...polygons.flat(), ...slotEdges.flat()];
         const onSegment = (p, a, b) => {
           const dx = b[0] - a[0];
           const dy = b[1] - a[1];
@@ -402,6 +412,7 @@
         };
 
         const foldKeys = new Set(folds.flatMap(([a, b]) => split(a, b).map(([start, end]) => edgeKey(start, end))));
+        const slotEdgeKeys = new Set(slotEdges.flatMap(([a, b]) => split(a, b).map(([start, end]) => edgeKey(start, end))));
         const edges = new Map();
         polygons.forEach((polygon) => {
           polygon.forEach((point, index) => {
@@ -414,7 +425,7 @@
         });
 
         const cutLines = [...edges.entries()]
-          .filter(([key]) => !foldKeys.has(key))
+          .filter(([key]) => !foldKeys.has(key) && !slotEdgeKeys.has(key))
           .map(([, [a, b]]) => `M${numberText(a[0])},${numberText(a[1])} L${numberText(b[0])},${numberText(b[1])}`)
           .join(" ");
         const foldLines = [...foldKeys]
@@ -422,12 +433,9 @@
           .map(([a, b]) => `M${numberText(a[0])},${numberText(a[1])} L${numberText(b[0])},${numberText(b[1])}`)
           .join(" ");
 
-        const slotWidth = Math.min(h * 0.1, w * 0.12);
-        const slotHeight = Math.min(l * 0.38, h);
-        const slotTop = (l - slotHeight) / 2;
         const baseSlots = [
-          `M0,${numberText(slotTop)} h${numberText(slotWidth)} v${numberText(slotHeight)} h-${numberText(slotWidth)}`,
-          `M${numberText(w - slotWidth)},${numberText(slotTop)} h${numberText(slotWidth)} M${numberText(w - slotWidth)},${numberText(slotTop)} v${numberText(slotHeight)} h${numberText(slotWidth)}`
+          `M0,${numberText(slotTop)} h${numberText(slotWidth)} v${numberText(slotHeight)} h-${numberText(slotWidth)} Z`,
+          `M${numberText(w - slotWidth)},${numberText(slotTop)} h${numberText(slotWidth)} v${numberText(slotHeight)} h-${numberText(slotWidth)} Z`
         ];
         const minX = left - sideLatchDepth - 4;
         const maxX = right + sideLatchDepth + 4;
