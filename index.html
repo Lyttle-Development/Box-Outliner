@@ -267,6 +267,23 @@
       .download:active:not(:disabled) { transform: translateY(1px); }
       .download:disabled { cursor: not-allowed; opacity: .48; }
 
+      .reset {
+        width: 100%;
+        min-height: 36px;
+        margin-top: 8px;
+        border: 1px solid #cfd3cc;
+        border-radius: 8px;
+        background: #fff;
+        color: var(--green);
+        cursor: pointer;
+        font: inherit;
+        font-size: 13px;
+        font-weight: 650;
+        transition: background .15s ease, border-color .15s ease;
+      }
+
+      .reset:hover { background: #f1f4ef; border-color: var(--green); }
+
       .notice {
         min-height: 18px;
         margin: 7px 0 0;
@@ -434,6 +451,7 @@
               </span>
             </label>
             <button class="download" id="download" type="button">Download SVG</button>
+            <button class="reset" id="reset" type="button">Reset to defaults</button>
             <p class="notice" id="notice" role="status" aria-live="polite"></p>
           </form>
           <p class="material-note">The dieline is a hinged-lid box with locking corner tabs and a tuck-in lid. Cardboard thickness and machine kerf are not compensated; test-fold a sample before production.</p>
@@ -470,6 +488,7 @@
       const preview = document.getElementById("preview");
       const notice = document.getElementById("notice");
       const downloadButton = document.getElementById("download");
+      const resetButton = document.getElementById("reset");
       const engraverWidth = 381;
       const engraverHeight = 305;
       let currentSvg = "";
@@ -688,22 +707,40 @@
         return Math.round(value * unitSettings[unit].mmPerUnit * 1000) / 1000;
       }
 
+      function applyUnitSettings() {
+        const settings = unitSettings[unit];
+        Object.values(inputs).forEach((input) => {
+          input.step = settings.step;
+          input.min = settings.min;
+          input.max = settings.max;
+        });
+        unitLabels.forEach((label) => { label.textContent = unit; });
+      }
+
       function setUnit(nextUnit) {
         if (nextUnit === unit) return;
         const mmValues = Object.values(inputs).map((input) => input.valueAsNumber * unitSettings[unit].mmPerUnit);
         unit = nextUnit;
-        const settings = unitSettings[unit];
+        applyUnitSettings();
         Object.values(inputs).forEach((input, index) => {
-          input.step = settings.step;
-          input.min = settings.min;
-          input.max = settings.max;
-          const value = mmValues[index] / settings.mmPerUnit;
+          const value = mmValues[index] / unitSettings[unit].mmPerUnit;
           if (Number.isFinite(value)) {
             input.value = unit === "mm" ? String(Math.round(value)) : String(Math.round(value * 10) / 10);
           }
         });
-        unitLabels.forEach((label) => { label.textContent = unit; });
         updatePreview();
+      }
+
+      function resetToDefaults() {
+        const defaults = { width: 150, length: 80, height: 40 };
+        unit = "mm";
+        unitRadios.forEach((radio) => { radio.checked = radio.value === unit; });
+        applyUnitSettings();
+        Object.entries(inputs).forEach(([key, input]) => { input.value = String(defaults[key]); });
+        perimeterInput.checked = true;
+        logoInput.value = "";
+        logoName.textContent = "logo.svg (default)";
+        loadDefaultLogo();
       }
 
       function updatePreview() {
@@ -766,6 +803,7 @@
       Object.values(inputs).forEach((input) => input.addEventListener("input", updatePreview));
       unitRadios.forEach((radio) => radio.addEventListener("change", () => setUnit(radio.value)));
       perimeterInput.addEventListener("change", updatePreview);
+      resetButton.addEventListener("click", resetToDefaults);
       downloadButton.addEventListener("click", () => {
         if (!currentSvg) return;
         const blob = new Blob([currentSvg], { type: "image/svg+xml;charset=utf-8" });
