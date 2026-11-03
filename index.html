@@ -138,6 +138,66 @@
         transform: translateY(-50%);
       }
 
+      .unit-switch {
+        display: inline-flex;
+        margin: 0 0 10px;
+        border: 1px solid #cfd3cc;
+        border-radius: 999px;
+        overflow: hidden;
+      }
+
+      .unit-option {
+        position: relative;
+        margin: 0;
+        padding: 5px 16px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 650;
+        cursor: pointer;
+      }
+
+      .unit-option input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        opacity: 0;
+      }
+
+      .unit-option:has(input:checked) { background: var(--green); color: #fff; }
+      .unit-option:has(input:focus-visible) { outline: 3px solid rgb(36 92 75 / 14%); }
+
+      .option {
+        display: flex;
+        margin: 12px 0 0;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 650;
+        cursor: pointer;
+      }
+
+      .option input {
+        width: 16px;
+        height: 16px;
+        margin: 0;
+        accent-color: var(--green);
+        cursor: pointer;
+      }
+
+      .logo-field {
+        display: block;
+        margin: 12px 0 0;
+      }
+
+      .logo-field input {
+        height: auto;
+        padding: 6px 0;
+        font-size: 12px;
+      }
+
       .download {
         width: 100%;
         min-height: 42px;
@@ -276,31 +336,49 @@
       <section class="workspace" aria-label="Box dieline generator">
         <section class="card form-card" aria-labelledby="dimensions-title">
           <h2 id="dimensions-title">Inside dimensions</h2>
-          <p class="hint">All measurements are in millimetres. The preview updates as you type.</p>
-          <form id="dimensions-form" novalidate>
+          <p class="hint">Choose the unit below. Millimetres take whole numbers; centimetres take decimals. The preview updates as you type.</p>
+          <div class="unit-switch" role="radiogroup" aria-label="Measurement unit">
+            <label class="unit-option">
+              <input type="radio" name="unit" value="mm" checked>
+              <span>mm</span>
+            </label>
+            <label class="unit-option">
+              <input type="radio" name="unit" value="cm">
+              <span>cm</span>
+            </label>
+          </div>
+          <form id="dimensions-form" novalidate autocomplete="off">
             <div class="dimensions">
               <div>
                 <label for="width">Width</label>
                 <div class="input-wrap">
-                  <input id="width" name="width" type="number" min="1" max="5000" step="0.1" value="200" required>
+                  <input id="width" name="width" type="number" min="1" max="5000" step="1" value="150" required>
                   <span class="unit" aria-hidden="true">mm</span>
                 </div>
               </div>
               <div>
                 <label for="length">Length</label>
                 <div class="input-wrap">
-                  <input id="length" name="length" type="number" min="1" max="5000" step="0.1" value="150" required>
+                  <input id="length" name="length" type="number" min="1" max="5000" step="1" value="80" required>
                   <span class="unit" aria-hidden="true">mm</span>
                 </div>
               </div>
               <div>
                 <label for="height">Height</label>
                 <div class="input-wrap">
-                  <input id="height" name="height" type="number" min="1" max="5000" step="0.1" value="75" required>
+                  <input id="height" name="height" type="number" min="1" max="5000" step="1" value="40" required>
                   <span class="unit" aria-hidden="true">mm</span>
                 </div>
               </div>
             </div>
+            <label class="option" for="perimeter">
+              <input id="perimeter" name="perimeter" type="checkbox" checked>
+              Show tight cut perimeter box
+            </label>
+            <label class="logo-field" for="logo">
+              Lid logo (SVG, defaults to logo.svg)
+              <input id="logo" name="logo" type="file" accept=".svg,image/svg+xml">
+            </label>
             <button class="download" id="download" type="button">Download SVG</button>
             <p class="notice" id="notice" role="status" aria-live="polite"></p>
           </form>
@@ -327,6 +405,14 @@
         length: document.getElementById("length"),
         height: document.getElementById("height")
       };
+      const unitSettings = {
+        mm: { mmPerUnit: 1, step: "1", min: "1", max: "5000", range: "1 to 5,000 mm" },
+        cm: { mmPerUnit: 10, step: "0.1", min: "0.1", max: "500", range: "0.1 to 500 cm" }
+      };
+      const unitRadios = document.querySelectorAll('input[name="unit"]');
+      const unitLabels = document.querySelectorAll(".unit");
+      let unit = document.querySelector('input[name="unit"]:checked').value;
+      let currentFileName = "box.svg";
       const preview = document.getElementById("preview");
       const notice = document.getElementById("notice");
       const downloadButton = document.getElementById("download");
@@ -338,7 +424,7 @@
       const pointKey = (point) => `${numberText(point[0])},${numberText(point[1])}`;
       const edgeKey = (a, b) => [pointKey(a), pointKey(b)].sort().join("|");
 
-      function makeBoxSvg(width, length, height) {
+      function makeBoxSvg(width, length, height, includePerimeter = true, logo = null) {
         const w = width;
         const l = length;
         const h = height;
@@ -474,6 +560,13 @@
           .map(([a, b]) => `M${numberText(a[0])},${numberText(a[1])} L${numberText(b[0])},${numberText(b[1])}`)
           .join(" ");
 
+        const logoMarkup = logo ? (() => {
+          const scale = Math.min((w * 0.6) / logo.width, (l * 0.5) / logo.height);
+          const centerX = w / 2;
+          const centerY = -h - l / 2;
+          return `<g transform="translate(${numberText(centerX - (logo.width * scale) / 2)} ${numberText(centerY - (logo.height * scale) / 2)}) scale(${numberText(scale)}) translate(${numberText(-logo.minX)} ${numberText(-logo.minY)})">${logo.body}</g>`;
+        })() : "";
+
         const baseSlots = [
           `M0,${numberText(slotTop)} h${numberText(slotWidth)} v${numberText(slotHeight)} h-${numberText(slotWidth)} Z`,
           `M${numberText(w - slotWidth)},${numberText(slotTop)} h${numberText(slotWidth)} v${numberText(slotHeight)} h-${numberText(slotWidth)} Z`
@@ -490,7 +583,7 @@
         return `<svg xmlns="http://www.w3.org/2000/svg" width="${numberText(svgWidth)}mm" height="${numberText(svgHeight)}mm" viewBox="${numberText(minX)} ${numberText(minY)} ${numberText(svgWidth)} ${numberText(svgHeight)}">
   <title>Folding cardboard box dieline — inside ${numberText(w)} × ${numberText(l)} × ${numberText(h)} mm</title>
   <g fill="none" stroke="#ff0000" stroke-width="0.15" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="${numberText(minX + frameInset)}" y="${numberText(minY + frameInset)}" width="${numberText(svgWidth - 2 * frameInset)}" height="${numberText(svgHeight - 2 * frameInset)}"/>
+    ${includePerimeter ? `<rect x="${numberText(minX + frameInset)}" y="${numberText(minY + frameInset)}" width="${numberText(svgWidth - 2 * frameInset)}" height="${numberText(svgHeight - 2 * frameInset)}"/>` : ""}
     <path d="${cutLines}"/>
     <path d="${tuckOutline}"/>
     <path d="${notchCurves.join(" ")}"/>
@@ -498,8 +591,19 @@
   </g>
   <g fill="none" stroke="#000000" stroke-width="0.15" stroke-linecap="round" stroke-linejoin="round">
     <path d="${foldLines}"/>
+    ${logoMarkup}
   </g>
 </svg>`;
+      }
+
+      function parseLogo(text) {
+        const tag = text.match(/<svg\b[^>]*>/);
+        const viewBox = tag && tag[0].match(/viewBox="([^"]+)"/);
+        if (!viewBox) return null;
+        const [minX, minY, width, height] = viewBox[1].split(/[\s,]+/).map(Number);
+        if (![minX, minY, width, height].every(Number.isFinite) || width <= 0 || height <= 0) return null;
+        const body = text.slice(text.indexOf(tag[0]) + tag[0].length, text.lastIndexOf("</svg>"));
+        return { minX, minY, width, height, body };
       }
 
       function makePreviewSvg(svg) {
@@ -526,33 +630,90 @@
         return svg.replace(svgTag, updatedTag).replace("</svg>", `${overlay}</svg>`);
       }
 
+      function toMm(value) {
+        return Math.round(value * unitSettings[unit].mmPerUnit * 1000) / 1000;
+      }
+
+      function setUnit(nextUnit) {
+        if (nextUnit === unit) return;
+        const mmValues = Object.values(inputs).map((input) => input.valueAsNumber * unitSettings[unit].mmPerUnit);
+        unit = nextUnit;
+        const settings = unitSettings[unit];
+        Object.values(inputs).forEach((input, index) => {
+          input.step = settings.step;
+          input.min = settings.min;
+          input.max = settings.max;
+          const value = mmValues[index] / settings.mmPerUnit;
+          if (Number.isFinite(value)) {
+            input.value = unit === "mm" ? String(Math.round(value)) : String(Math.round(value * 10) / 10);
+          }
+        });
+        unitLabels.forEach((label) => { label.textContent = unit; });
+        updatePreview();
+      }
+
       function updatePreview() {
-        const values = Object.values(inputs).map((input) => input.valueAsNumber);
-        const invalid = values.some((value, index) =>
-          !Number.isFinite(value) || value < 1 || value > 5000 || inputs[Object.keys(inputs)[index]].validity.badInput
-        );
+        const rawValues = Object.values(inputs).map((input) => input.valueAsNumber);
+        const mmValues = rawValues.map(toMm);
+        const invalid = Object.values(inputs).some((input, index) => {
+          const value = rawValues[index];
+          const mm = mmValues[index];
+          return !Number.isFinite(value) || mm < 1 || mm > 5000 || input.validity.badInput ||
+            (unit === "mm" && !Number.isInteger(value));
+        });
         if (invalid) {
           currentSvg = "";
-          preview.innerHTML = '<p class="empty-state">Enter a number from 1 to 5,000 mm for each dimension to see your dieline.</p>';
-          notice.textContent = "Dimensions must be between 1 and 5,000 mm.";
+          const wholeText = unit === "mm" ? "whole number" : "number";
+          preview.innerHTML = `<p class="empty-state">Enter a ${wholeText} from ${unitSettings[unit].range} for each dimension to see your dieline.</p>`;
+          notice.textContent = `Dimensions must be ${unit === "mm" ? "whole millimetres" : "numbers"} between ${unitSettings[unit].range}.`;
           downloadButton.disabled = true;
           return;
         }
 
-        currentSvg = makeBoxSvg(...values);
+        currentSvg = makeBoxSvg(...mmValues, perimeterInput.checked, currentLogo);
+        currentFileName = `box-${mmValues.join("x")}-mm.svg`;
         preview.innerHTML = makePreviewSvg(currentSvg);
         notice.textContent = "";
         downloadButton.disabled = false;
       }
 
+      const perimeterInput = document.getElementById("perimeter");
+      const logoInput = document.getElementById("logo");
+      let currentLogo = null;
+
+      async function loadDefaultLogo() {
+        let message = "";
+        try {
+          const response = await fetch("./logo.svg");
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          currentLogo = parseLogo(await response.text());
+          if (!currentLogo) message = "logo.svg has no usable viewBox; no logo was engraved.";
+        } catch {
+          currentLogo = null;
+          message = "Could not load ./logo.svg (browsers block this when opened from disk). Serve the folder or choose a logo file.";
+        }
+        updatePreview();
+        notice.textContent = message;
+      }
+
+      logoInput.addEventListener("change", async () => {
+        const file = logoInput.files[0];
+        if (!file) return loadDefaultLogo();
+        currentLogo = parseLogo(await file.text());
+        updatePreview();
+        notice.textContent = currentLogo ? "" : "The selected file has no usable viewBox; no logo was engraved.";
+      });
+
       Object.values(inputs).forEach((input) => input.addEventListener("input", updatePreview));
+      unitRadios.forEach((radio) => radio.addEventListener("change", () => setUnit(radio.value)));
+      perimeterInput.addEventListener("change", updatePreview);
       downloadButton.addEventListener("click", () => {
         if (!currentSvg) return;
         const blob = new Blob([currentSvg], { type: "image/svg+xml;charset=utf-8" });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.download = `box-${inputs.width.value}x${inputs.length.value}x${inputs.height.value}-mm.svg`;
+        link.download = currentFileName;
         document.body.appendChild(link);
         link.click();
         link.remove();
@@ -560,6 +721,7 @@
       });
 
       updatePreview();
+      loadDefaultLogo();
     </script>
   </body>
 </html>
