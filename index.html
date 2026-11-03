@@ -3,18 +3,23 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#f5f4f0">
+    <meta name="theme-color" content="#0d0b2b">
     <title>Box Outliner — cardboard box dielines</title>
     <style>
       :root {
-        color-scheme: light;
-        --ink: #202827;
-        --muted: #64716e;
-        --paper: #f5f4f0;
-        --card: #fff;
-        --line: #dedfd9;
-        --green: #245c4b;
+        color-scheme: dark;
+        --ink: #f4f2ff;
+        --muted: #a7a2cf;
+        --paper: #0d0b2b;
+        --card: #161339;
+        --field: #1d1a4a;
+        --line: #2b2865;
+        --border-input: #3d3987;
+        --accent: #7b5cff;
+        --accent-strong: #5f3fe6;
+        --coral: #ff5d62;
         --red: #ff0000;
+        --focus-ring: rgb(123 92 255 / 30%);
       }
 
       * { box-sizing: border-box; }
@@ -24,9 +29,16 @@
         min-width: 320px;
         height: 100%;
         overflow: hidden;
-        background: var(--paper);
+        background-color: var(--paper);
+        background-image:
+          radial-gradient(circle at 12% 8%, rgb(123 92 255 / 28%), transparent 38%),
+          radial-gradient(circle at 92% 92%, rgb(255 93 98 / 14%), transparent 34%),
+          radial-gradient(1px 1px at 20px 30px, #fff, transparent),
+          radial-gradient(1px 1px at 120px 140px, #ffffffcc, transparent),
+          radial-gradient(1.5px 1.5px at 210px 60px, #ffb3b3, transparent);
+        background-size: auto, auto, 260px 260px, 260px 260px, 260px 260px;
         color: var(--ink);
-        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-family: Poppins, Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       }
 
       .shell {
@@ -43,7 +55,7 @@
 
       .eyebrow {
         margin: 0 0 5px;
-        color: var(--green);
+        color: var(--coral);
         font-size: 10px;
         font-weight: 750;
         letter-spacing: .13em;
@@ -56,6 +68,8 @@
         letter-spacing: -.045em;
         line-height: 1;
       }
+
+      h1 span { color: var(--coral); }
 
       .intro {
         max-width: 610px;
@@ -78,9 +92,9 @@
         overflow: hidden;
         min-height: 0;
         border: 1px solid var(--line);
-        border-radius: 14px;
+        border-radius: 16px;
         background: var(--card);
-        box-shadow: 0 10px 30px rgb(32 40 39 / 4%);
+        box-shadow: 0 14px 40px rgb(0 0 0 / 35%);
       }
 
       .form-card { padding: 18px; }
@@ -116,17 +130,17 @@
         width: 100%;
         height: 40px;
         padding: 0 40px 0 10px;
-        border: 1px solid #cfd3cc;
-        border-radius: 8px;
-        background: #fff;
+        border: 1px solid var(--border-input);
+        border-radius: 10px;
+        background: var(--field);
         color: var(--ink);
         font: inherit;
         font-size: 14px;
       }
 
       input:focus {
-        border-color: var(--green);
-        outline: 3px solid rgb(36 92 75 / 14%);
+        border-color: var(--accent);
+        outline: 3px solid var(--focus-ring);
       }
 
       .unit {
@@ -141,7 +155,7 @@
       .unit-switch {
         display: inline-flex;
         margin: 0 0 10px;
-        border: 1px solid #cfd3cc;
+        border: 1px solid var(--border-input);
         border-radius: 999px;
         overflow: hidden;
       }
@@ -166,8 +180,8 @@
         opacity: 0;
       }
 
-      .unit-option:has(input:checked) { background: var(--green); color: #fff; }
-      .unit-option:has(input:focus-visible) { outline: 3px solid rgb(36 92 75 / 14%); }
+      .unit-option:has(input:checked) { background: var(--accent); color: #fff; }
+      .unit-option:has(input:focus-visible) { outline: 3px solid var(--focus-ring); }
 
       .option {
         display: flex;
@@ -183,7 +197,7 @@
         width: 16px;
         height: 16px;
         margin: 0;
-        accent-color: var(--green);
+        accent-color: var(--accent);
         cursor: pointer;
       }
 
@@ -199,17 +213,17 @@
         gap: 10px;
         height: 40px;
         padding: 0 10px 0 5px;
-        border: 1px solid #cfd3cc;
-        border-radius: 8px;
-        background: #fff;
+        border: 1px solid var(--border-input);
+        border-radius: 10px;
+        background: var(--field);
         cursor: pointer;
       }
 
-      .file-picker:hover .file-button { background: #1b4d3f; }
+      .file-picker:hover .file-button { background: var(--accent-strong); }
 
       .file-picker:focus-within {
-        border-color: var(--green);
-        outline: 3px solid rgb(36 92 75 / 14%);
+        border-color: var(--accent);
+        outline: 3px solid var(--focus-ring);
       }
 
       .file-picker input {
@@ -230,8 +244,8 @@
         align-items: center;
         height: 30px;
         padding: 0 12px;
-        border-radius: 6px;
-        background: var(--green);
+        border-radius: 999px;
+        background: var(--accent);
         color: #fff;
         font-size: 12px;
         font-weight: 650;
@@ -253,8 +267,8 @@
         min-height: 42px;
         margin-top: 14px;
         border: 0;
-        border-radius: 8px;
-        background: var(--green);
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--accent), var(--accent-strong));
         color: white;
         cursor: pointer;
         font: inherit;
@@ -263,7 +277,7 @@
         transition: background .15s ease, transform .15s ease;
       }
 
-      .download:hover:not(:disabled) { background: #194b3b; }
+      .download:hover:not(:disabled) { background: var(--accent-strong); }
       .download:active:not(:disabled) { transform: translateY(1px); }
       .download:disabled { cursor: not-allowed; opacity: .48; }
 
@@ -271,10 +285,10 @@
         width: 100%;
         min-height: 36px;
         margin-top: 8px;
-        border: 1px solid #cfd3cc;
-        border-radius: 8px;
-        background: #fff;
-        color: var(--green);
+        border: 1px solid var(--border-input);
+        border-radius: 999px;
+        background: transparent;
+        color: var(--ink);
         cursor: pointer;
         font: inherit;
         font-size: 13px;
@@ -282,12 +296,12 @@
         transition: background .15s ease, border-color .15s ease;
       }
 
-      .reset:hover { background: #f1f4ef; border-color: var(--green); }
+      .reset:hover { background: var(--field); border-color: var(--accent); }
 
       .notice {
         min-height: 18px;
         margin: 7px 0 0;
-        color: #a42b24;
+        color: var(--coral);
         font-size: 12px;
         line-height: 1.45;
       }
@@ -308,19 +322,20 @@
         min-height: 48px;
         padding: 10px 14px;
         flex: 0 0 auto;
-        border-bottom: 1px solid var(--line);
+        border-bottom: 1px solid #e3e1ef;
+        background: #fbfbf9;
         align-items: center;
         justify-content: space-between;
         gap: 12px;
       }
 
-      .preview-head h2 { font-size: 15px; }
+      .preview-head h2 { color: #1d1b3a; font-size: 15px; }
 
       .legend {
         display: flex;
         flex-wrap: wrap;
         gap: 10px;
-        color: var(--muted);
+        color: #5d5a7d;
         font-size: 10px;
       }
 
@@ -396,7 +411,7 @@
     <main class="shell">
       <header>
         <p class="eyebrow">A simple box-making tool</p>
-        <h1>Box Outliner</h1>
+        <h1>Box <span>Outliner</span></h1>
         <p class="intro">Enter the inside width, length and height. Get a ready-to-cut folding box dieline as an SVG.</p>
       </header>
 
