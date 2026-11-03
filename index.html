@@ -27,6 +27,7 @@
         --preview-grid: #312d78;
         --preview-ink: #e9e7f7;
         --preview-muted: #b3aed9;
+        --preview-logo: #a48bff;
       }
 
       * { box-sizing: border-box; }
@@ -77,6 +78,8 @@
       }
 
       h1 span { color: var(--coral); }
+
+      .nowrap { white-space: nowrap; }
 
       .intro {
         max-width: 610px;
@@ -382,6 +385,7 @@
       .preview svg [stroke="#202827"] { stroke: var(--preview-ink); }
       .preview svg [fill="#202827"] { fill: var(--preview-ink); }
       .preview svg [stroke="#fbfbf9"] { stroke: var(--preview-bg); }
+      .preview svg [fill="#000000"] { fill: var(--preview-logo); }
 
       .empty-state {
         max-width: 280px;
@@ -425,7 +429,7 @@
       <header>
         <p class="eyebrow">A simple box-making tool</p>
         <h1>Box <span>Outliner</span></h1>
-        <p class="intro">Enter the inside width, length and height. Get a ready-to-cut folding box dieline as an SVG.</p>
+        <p class="intro">Enter the inside width, length and height. Get a ready-to-cut folding box dieline as <span class="nowrap">an SVG.</span></p>
       </header>
 
       <section class="workspace" aria-label="Box dieline generator">
