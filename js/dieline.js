@@ -43,7 +43,7 @@ function makeBoxSvg(width, length, height, includePerimeter = true, logo = null)
   ];
   const sideLatchLength = l * 0.5;
   const sideLatchStart = (l - sideLatchLength) / 2;
-  const sideLatchDepth = 6;
+  const sideLatchDepth = 4;
   const slotWidth = 1.5;
   const slotHeight = l * 0.5;
   const slotTop = (l - slotHeight) / 2;
