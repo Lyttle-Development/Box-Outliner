@@ -8,7 +8,7 @@ The dieline includes a rounded tuck-in lid, side flaps, locking corner tabs and 
 
 ## Run locally
 
-Open `index.html` in a browser. No build step, server, or external dependencies are required.
+Open `index.html` in a browser. No build step, server, or external dependencies are required. The Poppins font loads from Google Fonts when online and falls back to system fonts otherwise.
 
 ## Publish on GitHub Pages
 

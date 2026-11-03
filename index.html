@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#0d0b2b">
     <title>Box Outliner — cardboard box dielines</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
     <style>
       :root {
         color-scheme: dark;
@@ -20,6 +23,10 @@
         --coral: #ff5d62;
         --red: #ff0000;
         --focus-ring: rgb(123 92 255 / 30%);
+        --preview-bg: #242062;
+        --preview-grid: #312d78;
+        --preview-ink: #e9e7f7;
+        --preview-muted: #b3aed9;
       }
 
       * { box-sizing: border-box; }
@@ -322,29 +329,29 @@
         min-height: 48px;
         padding: 10px 14px;
         flex: 0 0 auto;
-        border-bottom: 1px solid #e3e1ef;
-        background: #fbfbf9;
+        border-bottom: 1px solid var(--line);
+        background: var(--preview-bg);
         align-items: center;
         justify-content: space-between;
         gap: 12px;
       }
 
-      .preview-head h2 { color: #1d1b3a; font-size: 15px; }
+      .preview-head h2 { color: var(--ink); font-size: 15px; }
 
       .legend {
         display: flex;
         flex-wrap: wrap;
         gap: 10px;
-        color: #5d5a7d;
+        color: var(--preview-muted);
         font-size: 10px;
       }
 
       .legend-item { display: inline-flex; align-items: center; gap: 6px; }
       .swatch { width: 18px; height: 2px; background: var(--red); }
-      .swatch.engrave { background: #202827; }
+      .swatch.engrave { background: var(--preview-ink); }
       .swatch.workspace {
         height: 3px;
-        background: repeating-linear-gradient(90deg, #f08a24 0 4px, transparent 4px 6px, #202827 6px 7px, transparent 7px 10px);
+        background: repeating-linear-gradient(90deg, #f08a24 0 4px, transparent 4px 6px, var(--preview-ink) 6px 7px, transparent 7px 10px);
       }
 
       .preview {
@@ -353,8 +360,8 @@
         padding: 12px;
         flex: 1 1 auto;
         overflow: hidden;
-        background-color: #fbfbf9;
-        background-image: linear-gradient(#e9eae5 1px, transparent 1px), linear-gradient(90deg, #e9eae5 1px, transparent 1px);
+        background-color: var(--preview-bg);
+        background-image: linear-gradient(var(--preview-grid) 1px, transparent 1px), linear-gradient(90deg, var(--preview-grid) 1px, transparent 1px);
         background-size: 22px 22px;
         place-items: center;
       }
@@ -369,6 +376,12 @@
       }
 
       .preview svg g { stroke-width: .32; }
+
+      /* Preview-only recolor so engrave/fold lines stay visible on the dark panel; downloads are unaffected. */
+      .preview svg [stroke="#000000"],
+      .preview svg [stroke="#202827"] { stroke: var(--preview-ink); }
+      .preview svg [fill="#202827"] { fill: var(--preview-ink); }
+      .preview svg [stroke="#fbfbf9"] { stroke: var(--preview-bg); }
 
       .empty-state {
         max-width: 280px;
