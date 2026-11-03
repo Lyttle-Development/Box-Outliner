@@ -192,10 +192,60 @@
         margin: 12px 0 0;
       }
 
-      .logo-field input {
-        height: auto;
-        padding: 6px 0;
+      .file-picker {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        height: 40px;
+        padding: 0 10px 0 5px;
+        border: 1px solid #cfd3cc;
+        border-radius: 8px;
+        background: #fff;
+        cursor: pointer;
+      }
+
+      .file-picker:hover .file-button { background: #1b4d3f; }
+
+      .file-picker:focus-within {
+        border-color: var(--green);
+        outline: 3px solid rgb(36 92 75 / 14%);
+      }
+
+      .file-picker input {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        opacity: 0;
+        cursor: pointer;
+      }
+
+      .file-button {
+        flex: none;
+        display: inline-flex;
+        align-items: center;
+        height: 30px;
+        padding: 0 12px;
+        border-radius: 6px;
+        background: var(--green);
+        color: #fff;
         font-size: 12px;
+        font-weight: 650;
+        transition: background 0.15s ease;
+      }
+
+      .file-name {
+        min-width: 0;
+        overflow: hidden;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 400;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
 
       .download {
@@ -376,8 +426,12 @@
               Show tight cut perimeter box
             </label>
             <label class="logo-field" for="logo">
-              Lid logo (SVG, defaults to logo.svg)
-              <input id="logo" name="logo" type="file" accept=".svg,image/svg+xml">
+              Lid logo (SVG)
+              <span class="file-picker">
+                <input id="logo" name="logo" type="file" accept=".svg,image/svg+xml">
+                <span class="file-button" aria-hidden="true">Choose SVG</span>
+                <span class="file-name" id="logo-name">logo.svg (default)</span>
+              </span>
             </label>
             <button class="download" id="download" type="button">Download SVG</button>
             <p class="notice" id="notice" role="status" aria-live="polite"></p>
@@ -679,6 +733,7 @@
 
       const perimeterInput = document.getElementById("perimeter");
       const logoInput = document.getElementById("logo");
+      const logoName = document.getElementById("logo-name");
       let currentLogo = null;
 
       async function loadDefaultLogo() {
@@ -698,7 +753,11 @@
 
       logoInput.addEventListener("change", async () => {
         const file = logoInput.files[0];
-        if (!file) return loadDefaultLogo();
+        if (!file) {
+          logoName.textContent = "logo.svg (default)";
+          return loadDefaultLogo();
+        }
+        logoName.textContent = file.name;
         currentLogo = parseLogo(await file.text());
         updatePreview();
         notice.textContent = currentLogo ? "" : "The selected file has no usable viewBox; no logo was engraved.";
