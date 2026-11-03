@@ -9,8 +9,8 @@ function makeBoxSvg(width, length, height, includePerimeter = true, logo = null)
   const lidTop = -h - l;
   const tuckTip = lidTop - h;
   const tuckEarDepth = h * 0.9;
-  const notchInset = h * 0.25;
-  const tuckRx = tuckEarDepth - notchInset;
+  const notchInset = 3;
+  const tuckRx = tuckEarDepth - h * 0.25;
   const tuckRy = h / 2;
   const thumbR = h * 0.25;
   const thumbX = w / 2;
@@ -44,7 +44,7 @@ function makeBoxSvg(width, length, height, includePerimeter = true, logo = null)
   const sideLatchLength = l * 0.5;
   const sideLatchStart = (l - sideLatchLength) / 2;
   const sideLatchDepth = 6;
-  const slotWidth = Math.min(3, w / 2);
+  const slotWidth = 1.5;
   const slotHeight = l * 0.5;
   const slotTop = (l - slotHeight) / 2;
   const slotBottom = slotTop + slotHeight;
