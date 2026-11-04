@@ -142,7 +142,9 @@ function makeBoxSvg(width, length, height, includePerimeter = true, logo = null)
     const scale = Math.min((w * 0.6) / logo.width, (l * 0.5) / logo.height);
     const centerX = w / 2;
     const centerY = -h - l / 2;
-    return `<g transform="translate(${numberText(centerX - (logo.width * scale) / 2)} ${numberText(centerY - (logo.height * scale) / 2)}) scale(${numberText(scale)}) translate(${numberText(-logo.minX)} ${numberText(-logo.minY)})">${logo.body}</g>`;
+    const rotateCenterX = logo.minX + logo.width / 2;
+    const rotateCenterY = logo.minY + logo.height / 2;
+    return `<g transform="translate(${numberText(centerX - (logo.width * scale) / 2)} ${numberText(centerY - (logo.height * scale) / 2)}) scale(${numberText(scale)}) translate(${numberText(-logo.minX)} ${numberText(-logo.minY)}) rotate(180 ${numberText(rotateCenterX)} ${numberText(rotateCenterY)})">${logo.body}</g>`;
   })() : "";
 
   const baseSlots = [
