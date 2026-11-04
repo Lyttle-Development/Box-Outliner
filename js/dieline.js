@@ -137,6 +137,12 @@ function makeBoxSvg(width, length, height, includePerimeter = true, logo = null,
   const foldKeys = new Set(folds.flatMap(([a, b]) => split(a, b).map(([start, end]) => edgeKey(start, end))));
   const slotEdgeKeys = new Set(slotEdges.flatMap(([a, b]) => split(a, b).map(([start, end]) => edgeKey(start, end))));
   const edges = new Map();
+  const svgPadding = 2;
+  const frameInset = 1;
+  const minX = left - sideLatchDepth - svgPadding;
+  const maxX = right + sideLatchDepth + svgPadding;
+  const frameLeft = minX + frameInset;
+  const frameRight = maxX - frameInset;
   polygons.forEach((polygon) => {
     polygon.forEach((point, index) => {
       const next = polygon[(index + 1) % polygon.length];
@@ -149,9 +155,10 @@ function makeBoxSvg(width, length, height, includePerimeter = true, logo = null,
 
   const cutLines = [...edges.entries()]
     .filter(([key]) => !foldKeys.has(key) && !slotEdgeKeys.has(key))
+    .filter(([, [a, b]]) => !part || Math.abs(a[1] - splitY) > 1e-9 || Math.abs(b[1] - splitY) > 1e-9)
     .map(([, segment]) => clipToPart(segment))
     .filter(Boolean)
-    .concat(part ? [[part === "top" ? [left, splitY] : [-h, splitY], part === "top" ? [right, splitY] : [w + h, splitY]]] : [])
+    .concat(part ? [[includePerimeter ? [frameLeft, splitY] : part === "top" ? [left, splitY] : [-h, splitY], includePerimeter ? [frameRight, splitY] : part === "top" ? [right, splitY] : [w + h, splitY]]] : [])
     .map(([a, b]) => `M${numberText(a[0])},${numberText(a[1])} L${numberText(b[0])},${numberText(b[1])}`)
     .join(" ");
   const foldLines = [...foldKeys]
@@ -175,10 +182,6 @@ function makeBoxSvg(width, length, height, includePerimeter = true, logo = null,
     `M0,${numberText(slotTop)} h${numberText(slotWidth)} v${numberText(slotHeight)} h-${numberText(slotWidth)} Z`,
     `M${numberText(w - slotWidth)},${numberText(slotTop)} h${numberText(slotWidth)} v${numberText(slotHeight)} h-${numberText(slotWidth)} Z`
   ];
-  const svgPadding = 2;
-  const frameInset = 1;
-  const minX = left - sideLatchDepth - svgPadding;
-  const maxX = right + sideLatchDepth + svgPadding;
   const fullMinY = lidTop - h - svgPadding;
   const fullMaxY = l + h + svgPadding;
   const minY = part === "bottom" ? splitY - svgPadding : fullMinY;
@@ -187,12 +190,17 @@ function makeBoxSvg(width, length, height, includePerimeter = true, logo = null,
   const svgHeight = maxY - minY;
   const frameTop = part === "bottom" ? splitY : minY + frameInset;
   const frameBottom = part === "top" ? splitY : maxY - frameInset;
+  const perimeterMarkup = !includePerimeter ? "" : !part
+    ? `<rect x="${numberText(frameLeft)}" y="${numberText(frameTop)}" width="${numberText(frameRight - frameLeft)}" height="${numberText(frameBottom - frameTop)}"/>`
+    : part === "top"
+      ? `<path d="M${numberText(frameLeft)},${numberText(frameTop)} H${numberText(frameRight)} M${numberText(frameLeft)},${numberText(frameTop)} V${numberText(frameBottom)} M${numberText(frameRight)},${numberText(frameTop)} V${numberText(frameBottom)}"/>`
+      : `<path d="M${numberText(frameLeft)},${numberText(frameTop)} V${numberText(frameBottom)} M${numberText(frameRight)},${numberText(frameTop)} V${numberText(frameBottom)} M${numberText(frameLeft)},${numberText(frameBottom)} H${numberText(frameRight)}"/>`;
   const partTitle = part ? ` — part ${part === "top" ? "1 (top)" : "2 (bottom)"} of 2` : "";
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${numberText(svgWidth)}mm" height="${numberText(svgHeight)}mm" viewBox="${numberText(minX)} ${numberText(minY)} ${numberText(svgWidth)} ${numberText(svgHeight)}">
   <title>Folding cardboard box dieline — inside ${numberText(w)} × ${numberText(l)} × ${numberText(h)} mm${partTitle}</title>
   <g fill="none" stroke="#ff0000" stroke-width="0.15" stroke-linecap="round" stroke-linejoin="round">
-    ${includePerimeter ? `<rect x="${numberText(minX + frameInset)}" y="${numberText(frameTop)}" width="${numberText(svgWidth - 2 * frameInset)}" height="${numberText(frameBottom - frameTop)}"/>` : ""}
+    ${perimeterMarkup}
     <path d="${cutLines}"/>
     ${part === "bottom" ? "" : `<path d="${tuckOutline}"/>`}
     ${part === "bottom" ? "" : `<path d="${notchCurves.join(" ")}"/>`}
