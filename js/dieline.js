@@ -81,8 +81,10 @@ function makeBoxSvg(width, length, height, includePerimeter = true, logo = null,
     [[0, lidTop], [w, lidTop], [w, -h], [0, -h]],
     lidWingPoints("left"),
     lidWingPoints("right"),
-    [[-h, -h], [0, -h], [0, 0], [-h, 0]],
-    [[w, -h], [w + h, -h], [w + h, 0], [w, 0]],
+    ...(part === "top" ? [] : [
+      [[-h, -h], [0, -h], [0, 0], [-h, 0]],
+      [[w, -h], [w + h, -h], [w + h, 0], [w, 0]]
+    ]),
     [[-h, l], [0, l], [0, l + h], [-h, l + h]],
     [[w, l], [w + h, l], [w + h, l + h], [w, l + h]]
   ];
@@ -134,7 +136,12 @@ function makeBoxSvg(width, length, height, includePerimeter = true, logo = null,
     return ordered.slice(1).map((entry, index) => [ordered[index].point, entry.point]);
   };
 
-  const foldKeys = new Set(folds.flatMap(([a, b]) => split(a, b).map(([start, end]) => edgeKey(start, end))));
+  const removedFlapFolds = part === "top"
+    ? new Set([edgeKey([0, -h], [0, 0]), edgeKey([w, -h], [w, 0])])
+    : new Set();
+  const foldKeys = new Set(folds
+    .filter(([a, b]) => !removedFlapFolds.has(edgeKey(a, b)))
+    .flatMap(([a, b]) => split(a, b).map(([start, end]) => edgeKey(start, end))));
   const slotEdgeKeys = new Set(slotEdges.flatMap(([a, b]) => split(a, b).map(([start, end]) => edgeKey(start, end))));
   const edges = new Map();
   const perimeterGap = 2;

@@ -6,7 +6,7 @@ Enter the box's inside width, length and height. Use the **mm / cm** switch to p
 
 The dieline includes a rounded tuck-in lid, side flaps, locking corner tabs and slots, plus an optional close-fitting rectangular cut perimeter with 2 mm clearance around the cut outline. Untick **Show tight cut perimeter box** to leave it out of the preview and the downloaded SVG. It does not compensate for cardboard thickness or laser kerf, so test-fold a sample before production.
 
-When **Split into two pieces** is enabled, part 1 includes an overlap strip equal to the box height for gluing the two pieces together.
+When **Split into two pieces** is enabled, part 1 includes an overlap strip equal to the box height for gluing the two pieces together, without the two corner flaps at the overlap end. The corresponding lower corner flaps remain on part 2.
 
 ## Run locally
 
