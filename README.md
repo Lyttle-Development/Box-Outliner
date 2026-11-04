@@ -8,7 +8,7 @@ The dieline includes a rounded tuck-in lid, side flaps, locking corner tabs and 
 
 Colors in the default or uploaded logo SVG are normalized to `#808080`; the dieline's red cut lines and black fold lines are unchanged.
 
-When **Split into two pieces** is enabled, part 1 includes an overlap strip equal to the box height for gluing the two pieces together, without the two corner flaps at the overlap end or the full-width cut line at the split edge. The corresponding lower corner flaps and split-edge cut line remain on part 2.
+When **Split into two pieces** is enabled, part 1 includes an overlap strip equal to the box height for gluing the two pieces together, without the two corner flaps at the overlap end or the cut-line extensions outside the box width. The corresponding lower corner flaps and full split-edge cut line remain on part 2.
 
 ## Run locally
 

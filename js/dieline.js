@@ -168,7 +168,9 @@ function makeBoxSvg(width, length, height, includePerimeter = true, logo = null,
     .filter(([, [a, b]]) => !part || Math.abs(a[1] - splitY) > 1e-9 || Math.abs(b[1] - splitY) > 1e-9)
     .map(([, segment]) => clipToPart(segment))
     .filter(Boolean)
-    .concat(part === "bottom" ? [[[-h, splitY], [w + h, splitY]]] : [])
+    .concat(part === "top"
+      ? [[[0, splitY], [w, splitY]]]
+      : part === "bottom" ? [[[-h, splitY], [w + h, splitY]]] : [])
     .map(([a, b]) => `M${numberText(a[0])},${numberText(a[1])} L${numberText(b[0])},${numberText(b[1])}`)
     .join(" ");
   const foldLines = [...foldKeys]
