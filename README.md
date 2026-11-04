@@ -6,6 +6,8 @@ Enter the box's inside width, length and height. Use the **mm / cm** switch to p
 
 The dieline includes a rounded tuck-in lid, side flaps, locking corner tabs and slots, plus an optional close-fitting rectangular cut perimeter to keep the sheet rectangular. Untick **Show tight cut perimeter box** to leave it out of the preview and the downloaded SVG. It does not compensate for cardboard thickness or laser kerf, so test-fold a sample before production.
 
+When **Split into two pieces** is enabled, the cut runs along the lid-to-wall fold so it does not bisect either panel.
+
 ## Run locally
 
 Open `index.html` in a browser. No build step, server, or external dependencies are required. The Poppins font loads from Google Fonts when online and falls back to system fonts otherwise.

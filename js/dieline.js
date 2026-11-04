@@ -6,8 +6,8 @@ function makeBoxSvg(width, length, height, includePerimeter = true, logo = null,
   const w = width;
   const l = length;
   const h = height;
-  // Split mode: the sheet is cut along a horizontal seam through the walls (y = -h/2), which only crosses straight segments.
-  const splitY = -h / 2;
+  // Split at the lid-to-wall fold so neither piece bisects a panel.
+  const splitY = -h;
   const keepsPart = (point) => {
     if (part === "bottom") return point[1] >= splitY - 1e-9;
     if (part === "top") return point[1] <= splitY + 1e-9;
@@ -156,6 +156,7 @@ function makeBoxSvg(width, length, height, includePerimeter = true, logo = null,
     .join(" ");
   const foldLines = [...foldKeys]
     .map((key) => key.split("|").map((pair) => pair.split(",").map(Number)))
+    .filter(([a, b]) => !part || Math.abs(a[1] - splitY) > 1e-9 || Math.abs(b[1] - splitY) > 1e-9)
     .map(clipToPart)
     .filter(Boolean)
     .map(([a, b]) => `M${numberText(a[0])},${numberText(a[1])} L${numberText(b[0])},${numberText(b[1])}`)
