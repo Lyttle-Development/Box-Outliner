@@ -2,10 +2,28 @@ const numberText = (value) => Number(value.toFixed(3)).toString();
 const pointKey = (point) => `${numberText(point[0])},${numberText(point[1])}`;
 const edgeKey = (a, b) => [pointKey(a), pointKey(b)].sort().join("|");
 
-function makeBoxSvg(width, length, height, includePerimeter = true, logo = null) {
+function makeBoxSvg(width, length, height, includePerimeter = true, logo = null, part = null) {
   const w = width;
   const l = length;
   const h = height;
+  // Split mode: the sheet is cut along a horizontal seam through the walls (y = -h/2), which only crosses straight segments.
+  const splitY = -h / 2;
+  const keepsPart = (point) => {
+    if (part === "bottom") return point[1] >= splitY - 1e-9;
+    if (part === "top") return point[1] <= splitY + 1e-9;
+    return true;
+  };
+  const clipToPart = ([a, b]) => {
+    if (!part) return [a, b];
+    const aKept = keepsPart(a);
+    const bKept = keepsPart(b);
+    if (aKept && bKept) return [a, b];
+    if (!aKept && !bKept) return null;
+    const t = (splitY - a[1]) / (b[1] - a[1]);
+    const crossing = [a[0] + (b[0] - a[0]) * t, splitY];
+    const clipped = aKept ? [a, crossing] : [crossing, b];
+    return Math.hypot(clipped[1][0] - clipped[0][0], clipped[1][1] - clipped[0][1]) < 1e-9 ? null : clipped;
+  };
   const lidTop = -h - l;
   const tuckTip = lidTop - h;
   const tuckEarDepth = h * 0.9;
@@ -131,10 +149,15 @@ function makeBoxSvg(width, length, height, includePerimeter = true, logo = null)
 
   const cutLines = [...edges.entries()]
     .filter(([key]) => !foldKeys.has(key) && !slotEdgeKeys.has(key))
-    .map(([, [a, b]]) => `M${numberText(a[0])},${numberText(a[1])} L${numberText(b[0])},${numberText(b[1])}`)
+    .map(([, segment]) => clipToPart(segment))
+    .filter(Boolean)
+    .concat(part ? [[[-h, splitY], [w + h, splitY]]] : [])
+    .map(([a, b]) => `M${numberText(a[0])},${numberText(a[1])} L${numberText(b[0])},${numberText(b[1])}`)
     .join(" ");
   const foldLines = [...foldKeys]
     .map((key) => key.split("|").map((pair) => pair.split(",").map(Number)))
+    .map(clipToPart)
+    .filter(Boolean)
     .map(([a, b]) => `M${numberText(a[0])},${numberText(a[1])} L${numberText(b[0])},${numberText(b[1])}`)
     .join(" ");
 
@@ -155,23 +178,28 @@ function makeBoxSvg(width, length, height, includePerimeter = true, logo = null)
   const frameInset = 1;
   const minX = left - sideLatchDepth - svgPadding;
   const maxX = right + sideLatchDepth + svgPadding;
-  const minY = lidTop - h - svgPadding;
-  const maxY = l + h + svgPadding;
+  const fullMinY = lidTop - h - svgPadding;
+  const fullMaxY = l + h + svgPadding;
+  const minY = part === "bottom" ? splitY - svgPadding : fullMinY;
+  const maxY = part === "top" ? splitY + svgPadding : fullMaxY;
   const svgWidth = maxX - minX;
   const svgHeight = maxY - minY;
+  const frameTop = part === "bottom" ? splitY : minY + frameInset;
+  const frameBottom = part === "top" ? splitY : maxY - frameInset;
+  const partTitle = part ? ` — part ${part === "top" ? "1 (top)" : "2 (bottom)"} of 2` : "";
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${numberText(svgWidth)}mm" height="${numberText(svgHeight)}mm" viewBox="${numberText(minX)} ${numberText(minY)} ${numberText(svgWidth)} ${numberText(svgHeight)}">
-  <title>Folding cardboard box dieline — inside ${numberText(w)} × ${numberText(l)} × ${numberText(h)} mm</title>
+  <title>Folding cardboard box dieline — inside ${numberText(w)} × ${numberText(l)} × ${numberText(h)} mm${partTitle}</title>
   <g fill="none" stroke="#ff0000" stroke-width="0.15" stroke-linecap="round" stroke-linejoin="round">
-    ${includePerimeter ? `<rect x="${numberText(minX + frameInset)}" y="${numberText(minY + frameInset)}" width="${numberText(svgWidth - 2 * frameInset)}" height="${numberText(svgHeight - 2 * frameInset)}"/>` : ""}
+    ${includePerimeter ? `<rect x="${numberText(minX + frameInset)}" y="${numberText(frameTop)}" width="${numberText(svgWidth - 2 * frameInset)}" height="${numberText(frameBottom - frameTop)}"/>` : ""}
     <path d="${cutLines}"/>
-    <path d="${tuckOutline}"/>
-    <path d="${notchCurves.join(" ")}"/>
-    <path d="${baseSlots.join(" ")}"/>
+    ${part === "bottom" ? "" : `<path d="${tuckOutline}"/>`}
+    ${part === "bottom" ? "" : `<path d="${notchCurves.join(" ")}"/>`}
+    ${part === "top" ? "" : `<path d="${baseSlots.join(" ")}"/>`}
   </g>
   <g fill="none" stroke="#000000" stroke-width="0.15" stroke-linecap="round" stroke-linejoin="round">
     <path d="${foldLines}"/>
-    ${logoMarkup}
+    ${part === "bottom" ? "" : logoMarkup}
   </g>
 </svg>`;
 }

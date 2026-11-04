@@ -60,6 +60,10 @@
               <input id="perimeter" name="perimeter" type="checkbox" checked>
               Show tight cut perimeter box
             </label>
+            <label class="option" for="split">
+              <input id="split" name="split" type="checkbox">
+              Split into two pieces (for a smaller engraver bed)
+            </label>
             <label class="logo-field" for="logo">
               Lid logo (SVG)
               <span class="file-picker">
@@ -83,6 +87,10 @@
               <span class="legend-item"><span class="swatch engrave"></span>Engrave / fold</span>
               <span class="legend-item"><span class="swatch workspace"></span>Max bed 381 × 305 mm</span>
             </div>
+          </div>
+          <div class="part-tabs" id="part-tabs" role="tablist" aria-label="Dieline piece" hidden>
+            <button type="button" role="tab" id="part-top" data-part="top" aria-selected="true">Part 1 · top</button>
+            <button type="button" role="tab" id="part-bottom" data-part="bottom" aria-selected="false">Part 2 · bottom</button>
           </div>
           <div class="preview" id="preview" aria-label="SVG dieline preview"></div>
         </section>

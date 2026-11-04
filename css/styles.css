@@ -346,6 +346,31 @@ input:focus {
   background: repeating-linear-gradient(90deg, #f08a24 0 4px, transparent 4px 6px, var(--preview-ink) 6px 7px, transparent 7px 10px);
 }
 
+.part-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 8px 12px 0;
+  background: var(--preview-bg);
+}
+
+.part-tabs[hidden] { display: none; }
+
+.part-tabs button {
+  padding: 5px 14px;
+  border: 1px solid var(--preview-muted);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--preview-muted);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.part-tabs button.active,
+.part-tabs button[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.part-tabs button:focus-visible { outline: 3px solid var(--focus-ring); }
+
 .preview {
   display: grid;
   min-height: 0;

@@ -16,9 +16,15 @@ const notice = document.getElementById("notice");
 const downloadButton = document.getElementById("download");
 const resetButton = document.getElementById("reset");
 const perimeterInput = document.getElementById("perimeter");
+const splitInput = document.getElementById("split");
+const partTabs = document.getElementById("part-tabs");
+const partButtons = partTabs.querySelectorAll("[data-part]");
 const logoInput = document.getElementById("logo");
 const logoName = document.getElementById("logo-name");
 let currentSvg = "";
+let currentSvgs = {};
+let currentDimensions = "";
+let activePart = "top";
 let currentLogo = null;
 
 function toMm(value) {
@@ -56,9 +62,25 @@ function resetToDefaults() {
   applyUnitSettings();
   Object.entries(inputs).forEach(([key, input]) => { input.value = String(defaults[key]); });
   perimeterInput.checked = true;
+  splitInput.checked = false;
+  activePart = "top";
   logoInput.value = "";
   logoName.textContent = "logo.svg (default)";
   loadDefaultLogo();
+}
+
+function renderPreview() {
+  const key = splitInput.checked ? activePart : "whole";
+  currentSvg = currentSvgs[key] || "";
+  currentFileName = `box-${currentDimensions}-mm${splitInput.checked ? `-part-${key}` : ""}.svg`;
+  if (currentSvg) preview.innerHTML = makePreviewSvg(currentSvg);
+  downloadButton.disabled = !currentSvg;
+  downloadButton.textContent = splitInput.checked ? `Download part ${activePart === "top" ? 1 : 2} SVG` : "Download SVG";
+  partButtons.forEach((button) => {
+    const selected = button.dataset.part === activePart;
+    button.setAttribute("aria-selected", String(selected));
+    button.classList.toggle("active", selected);
+  });
 }
 
 function updatePreview() {
@@ -71,7 +93,9 @@ function updatePreview() {
       (unit === "mm" && !Number.isInteger(value));
   });
   if (invalid) {
+    currentSvgs = {};
     currentSvg = "";
+    partTabs.hidden = true;
     const wholeText = unit === "mm" ? "whole number" : "number";
     preview.innerHTML = `<p class="empty-state">Enter a ${wholeText} from ${unitSettings[unit].range} for each dimension to see your dieline.</p>`;
     notice.textContent = `Dimensions must be ${unit === "mm" ? "whole millimetres" : "numbers"} between ${unitSettings[unit].range}.`;
@@ -79,11 +103,19 @@ function updatePreview() {
     return;
   }
 
-  currentSvg = makeBoxSvg(...mmValues, perimeterInput.checked, currentLogo);
-  currentFileName = `box-${mmValues.join("x")}-mm.svg`;
-  preview.innerHTML = makePreviewSvg(currentSvg);
+  const includePerimeter = perimeterInput.checked;
+  currentDimensions = mmValues.join("x");
+  if (splitInput.checked) {
+    currentSvgs = {
+      top: makeBoxSvg(...mmValues, includePerimeter, currentLogo, "top"),
+      bottom: makeBoxSvg(...mmValues, includePerimeter, currentLogo, "bottom")
+    };
+  } else {
+    currentSvgs = { whole: makeBoxSvg(...mmValues, includePerimeter, currentLogo) };
+  }
+  partTabs.hidden = !splitInput.checked;
   notice.textContent = "";
-  downloadButton.disabled = false;
+  renderPreview();
 }
 
 async function loadDefaultLogo() {
@@ -116,6 +148,13 @@ logoInput.addEventListener("change", async () => {
 Object.values(inputs).forEach((input) => input.addEventListener("input", updatePreview));
 unitRadios.forEach((radio) => radio.addEventListener("change", () => setUnit(radio.value)));
 perimeterInput.addEventListener("change", updatePreview);
+splitInput.addEventListener("change", updatePreview);
+partButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    activePart = button.dataset.part;
+    renderPreview();
+  });
+});
 resetButton.addEventListener("click", resetToDefaults);
 downloadButton.addEventListener("click", () => {
   if (!currentSvg) return;
