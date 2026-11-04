@@ -168,7 +168,7 @@ function makeBoxSvg(width, length, height, includePerimeter = true, logo = null,
     .filter(([, [a, b]]) => !part || Math.abs(a[1] - splitY) > 1e-9 || Math.abs(b[1] - splitY) > 1e-9)
     .map(([, segment]) => clipToPart(segment))
     .filter(Boolean)
-    .concat(part ? [[[-h, splitY], [w + h, splitY]]] : [])
+    .concat(part === "bottom" ? [[[-h, splitY], [w + h, splitY]]] : [])
     .map(([a, b]) => `M${numberText(a[0])},${numberText(a[1])} L${numberText(b[0])},${numberText(b[1])}`)
     .join(" ");
   const foldLines = [...foldKeys]
@@ -185,7 +185,7 @@ function makeBoxSvg(width, length, height, includePerimeter = true, logo = null,
     const centerY = -h - l / 2;
     const rotateCenterX = logo.minX + logo.width / 2;
     const rotateCenterY = logo.minY + logo.height / 2;
-    return `<g transform="translate(${numberText(centerX - (logo.width * scale) / 2)} ${numberText(centerY - (logo.height * scale) / 2)}) scale(${numberText(scale)}) translate(${numberText(-logo.minX)} ${numberText(-logo.minY)}) rotate(180 ${numberText(rotateCenterX)} ${numberText(rotateCenterY)})">${logo.body}</g>`;
+    return `<g fill="#808080" stroke="none" color="#808080" transform="translate(${numberText(centerX - (logo.width * scale) / 2)} ${numberText(centerY - (logo.height * scale) / 2)}) scale(${numberText(scale)}) translate(${numberText(-logo.minX)} ${numberText(-logo.minY)}) rotate(180 ${numberText(rotateCenterX)} ${numberText(rotateCenterY)})">${logo.body}</g>`;
   })() : "";
 
   const baseSlots = [
