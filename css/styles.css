@@ -321,10 +321,11 @@ input:focus {
   min-height: 48px;
   padding: 10px 14px;
   flex: 0 0 auto;
+  flex-wrap: wrap;
   border-bottom: 1px solid var(--line);
   background: var(--preview-bg);
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 12px;
 }
 
@@ -333,6 +334,7 @@ input:focus {
 .legend {
   display: flex;
   flex-wrap: wrap;
+  margin-left: auto;
   gap: 10px;
   color: var(--preview-muted);
   font-size: 10px;
@@ -349,8 +351,8 @@ input:focus {
 .part-tabs {
   display: flex;
   gap: 6px;
-  padding: 8px 12px 0;
-  background: var(--preview-bg);
+  flex: 0 0 auto;
+  align-items: center;
 }
 
 .part-tabs[hidden] { display: none; }
@@ -434,5 +436,6 @@ input:focus {
 
 @media (max-width: 440px) {
   .preview-head { align-items: flex-start; flex-direction: column; }
+  .legend { margin-left: 0; }
   .preview { padding: 6px; }
 }

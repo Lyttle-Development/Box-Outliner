@@ -82,15 +82,15 @@
         <section class="card preview-card" aria-labelledby="preview-title">
           <div class="preview-head">
             <h2 id="preview-title">Live dieline preview</h2>
+            <div class="part-tabs" id="part-tabs" role="tablist" aria-label="Dieline piece" hidden>
+              <button type="button" role="tab" id="part-top" data-part="top" aria-selected="true">Part 1 · top</button>
+              <button type="button" role="tab" id="part-bottom" data-part="bottom" aria-selected="false">Part 2 · bottom</button>
+            </div>
             <div class="legend" aria-label="Line colors">
               <span class="legend-item"><span class="swatch"></span>Cut</span>
               <span class="legend-item"><span class="swatch engrave"></span>Engrave / fold</span>
               <span class="legend-item"><span class="swatch workspace"></span>Max bed 381 × 305 mm</span>
             </div>
-          </div>
-          <div class="part-tabs" id="part-tabs" role="tablist" aria-label="Dieline piece" hidden>
-            <button type="button" role="tab" id="part-top" data-part="top" aria-selected="true">Part 1 · top</button>
-            <button type="button" role="tab" id="part-bottom" data-part="bottom" aria-selected="false">Part 2 · bottom</button>
           </div>
           <div class="preview" id="preview" aria-label="SVG dieline preview"></div>
         </section>
