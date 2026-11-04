@@ -139,8 +139,10 @@ function makeBoxSvg(width, length, height, includePerimeter = true, logo = null,
   const edges = new Map();
   const svgPadding = 2;
   const frameInset = 1;
-  const minX = left - sideLatchDepth - svgPadding;
-  const maxX = right + sideLatchDepth + svgPadding;
+  const partMinX = part === "top" ? Math.min(-h, -notchInset) : left - sideLatchDepth;
+  const partMaxX = part === "top" ? Math.max(w + h, w + notchInset) : right + sideLatchDepth;
+  const minX = partMinX - svgPadding;
+  const maxX = partMaxX + svgPadding;
   const frameLeft = minX + frameInset;
   const frameRight = maxX - frameInset;
   polygons.forEach((polygon) => {
