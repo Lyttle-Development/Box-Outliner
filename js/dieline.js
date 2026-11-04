@@ -6,8 +6,8 @@ function makeBoxSvg(width, length, height, includePerimeter = true, logo = null,
   const w = width;
   const l = length;
   const h = height;
-  // Split at the lid-to-wall fold so neither piece bisects a panel.
-  const splitY = -h;
+  // Part 1 includes a height-wide overlap strip; part 2 starts at the original seam.
+  const splitY = part === "top" ? 0 : -h;
   const keepsPart = (point) => {
     if (part === "bottom") return point[1] >= splitY - 1e-9;
     if (part === "top") return point[1] <= splitY + 1e-9;
@@ -151,7 +151,7 @@ function makeBoxSvg(width, length, height, includePerimeter = true, logo = null,
     .filter(([key]) => !foldKeys.has(key) && !slotEdgeKeys.has(key))
     .map(([, segment]) => clipToPart(segment))
     .filter(Boolean)
-    .concat(part ? [[[-h, splitY], [w + h, splitY]]] : [])
+    .concat(part ? [[part === "top" ? [left, splitY] : [-h, splitY], part === "top" ? [right, splitY] : [w + h, splitY]]] : [])
     .map(([a, b]) => `M${numberText(a[0])},${numberText(a[1])} L${numberText(b[0])},${numberText(b[1])}`)
     .join(" ");
   const foldLines = [...foldKeys]
