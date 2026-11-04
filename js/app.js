@@ -5,7 +5,7 @@ const inputs = {
 };
 const unitSettings = {
   mm: { mmPerUnit: 1, step: "1", min: "1", max: "5000", range: "1 to 5,000 mm" },
-  cm: { mmPerUnit: 10, step: "0.1", min: "0.1", max: "500", range: "0.1 to 500 cm" }
+  cm: { mmPerUnit: 10, step: "1", min: "0.1", max: "500", range: "0.1 to 500 cm" }
 };
 const unitRadios = document.querySelectorAll('input[name="unit"]');
 const unitLabels = document.querySelectorAll(".unit");
