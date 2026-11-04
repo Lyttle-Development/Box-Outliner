@@ -24,5 +24,10 @@ function makePreviewSvg(svg) {
     <rect x="${numberText(bedX)}" y="${numberText(bedY)}" width="${engraverWidth}" height="${engraverHeight}" fill="none" stroke="#202827" stroke-width="2.2" stroke-dasharray="4 4" stroke-dashoffset="-4"/>
     <text x="${numberText(bedX + 4)}" y="${numberText(bedY + 10)}" fill="#202827" stroke="#fbfbf9" stroke-width="1.5" paint-order="stroke" font-size="5" font-family="sans-serif">Max engraver area · 381 × 305 mm</text>
   </g>`;
-  return svg.replace(svgTag, updatedTag).replace("</svg>", `${overlay}</svg>`);
+  const body = svg.slice(svg.indexOf(svgTag) + svgTag.length, svg.lastIndexOf("</svg>"));
+  // Preview only: the dieline is turned 180° about its centre so the lid logo reads correctly; the bed overlay stays upright. Downloads are unaffected.
+  const dielineCentreX = viewX + viewWidth / 2;
+  const dielineCentreY = viewY + viewHeight / 2;
+  const rotatedBody = `<g transform="rotate(180 ${numberText(dielineCentreX)} ${numberText(dielineCentreY)})">${body}</g>`;
+  return `${updatedTag}${rotatedBody}${overlay}</svg>`;
 }
