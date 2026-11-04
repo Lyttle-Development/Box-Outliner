@@ -137,12 +137,13 @@ function makeBoxSvg(width, length, height, includePerimeter = true, logo = null,
   const foldKeys = new Set(folds.flatMap(([a, b]) => split(a, b).map(([start, end]) => edgeKey(start, end))));
   const slotEdgeKeys = new Set(slotEdges.flatMap(([a, b]) => split(a, b).map(([start, end]) => edgeKey(start, end))));
   const edges = new Map();
-  const svgPadding = 2;
+  const perimeterGap = 2;
+  const svgPadding = 1;
   const frameInset = 1;
   const partMinX = part === "top" ? Math.min(-h, -notchInset) : left - sideLatchDepth;
   const partMaxX = part === "top" ? Math.max(w + h, w + notchInset) : right + sideLatchDepth;
-  const minX = partMinX - svgPadding;
-  const maxX = partMaxX + svgPadding;
+  const minX = partMinX - perimeterGap - svgPadding;
+  const maxX = partMaxX + perimeterGap + svgPadding;
   const frameLeft = minX + frameInset;
   const frameRight = maxX - frameInset;
   polygons.forEach((polygon) => {
@@ -160,7 +161,7 @@ function makeBoxSvg(width, length, height, includePerimeter = true, logo = null,
     .filter(([, [a, b]]) => !part || Math.abs(a[1] - splitY) > 1e-9 || Math.abs(b[1] - splitY) > 1e-9)
     .map(([, segment]) => clipToPart(segment))
     .filter(Boolean)
-    .concat(part ? [[includePerimeter ? [frameLeft, splitY] : part === "top" ? [left, splitY] : [-h, splitY], includePerimeter ? [frameRight, splitY] : part === "top" ? [right, splitY] : [w + h, splitY]]] : [])
+    .concat(part ? [[[-h, splitY], [w + h, splitY]]] : [])
     .map(([a, b]) => `M${numberText(a[0])},${numberText(a[1])} L${numberText(b[0])},${numberText(b[1])}`)
     .join(" ");
   const foldLines = [...foldKeys]
@@ -184,19 +185,17 @@ function makeBoxSvg(width, length, height, includePerimeter = true, logo = null,
     `M0,${numberText(slotTop)} h${numberText(slotWidth)} v${numberText(slotHeight)} h-${numberText(slotWidth)} Z`,
     `M${numberText(w - slotWidth)},${numberText(slotTop)} h${numberText(slotWidth)} v${numberText(slotHeight)} h-${numberText(slotWidth)} Z`
   ];
-  const fullMinY = lidTop - h - svgPadding;
-  const fullMaxY = l + h + svgPadding;
-  const minY = part === "bottom" ? splitY - svgPadding : fullMinY;
-  const maxY = part === "top" ? splitY + svgPadding : fullMaxY;
+  const fullMinY = lidTop - h - perimeterGap - svgPadding;
+  const fullMaxY = l + h + perimeterGap + svgPadding;
+  const minY = part === "bottom" ? splitY - perimeterGap - svgPadding : fullMinY;
+  const maxY = part === "top" ? splitY + perimeterGap + svgPadding : fullMaxY;
   const svgWidth = maxX - minX;
   const svgHeight = maxY - minY;
-  const frameTop = part === "bottom" ? splitY : minY + frameInset;
-  const frameBottom = part === "top" ? splitY : maxY - frameInset;
-  const perimeterMarkup = !includePerimeter ? "" : !part
+  const frameTop = part === "bottom" ? splitY - perimeterGap : minY + frameInset;
+  const frameBottom = part === "top" ? splitY + perimeterGap : maxY - frameInset;
+  const perimeterMarkup = includePerimeter
     ? `<rect x="${numberText(frameLeft)}" y="${numberText(frameTop)}" width="${numberText(frameRight - frameLeft)}" height="${numberText(frameBottom - frameTop)}"/>`
-    : part === "top"
-      ? `<path d="M${numberText(frameLeft)},${numberText(frameTop)} H${numberText(frameRight)} M${numberText(frameLeft)},${numberText(frameTop)} V${numberText(frameBottom)} M${numberText(frameRight)},${numberText(frameTop)} V${numberText(frameBottom)}"/>`
-      : `<path d="M${numberText(frameLeft)},${numberText(frameTop)} V${numberText(frameBottom)} M${numberText(frameRight)},${numberText(frameTop)} V${numberText(frameBottom)} M${numberText(frameLeft)},${numberText(frameBottom)} H${numberText(frameRight)}"/>`;
+    : "";
   const partTitle = part ? ` — part ${part === "top" ? "1 (top)" : "2 (bottom)"} of 2` : "";
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${numberText(svgWidth)}mm" height="${numberText(svgHeight)}mm" viewBox="${numberText(minX)} ${numberText(minY)} ${numberText(svgWidth)} ${numberText(svgHeight)}">
